@@ -1,0 +1,32 @@
+ *************************************************
+ Autochem(temporal name) May 2017
+ Author: Teresa Tamayo Mendoza 
+ *************************************************
+
+ Starting at Sun Jun 11 16:46:42 2017
+ -------------------------------------------------------- 
+ Task: Opt 
+
+ Outputfiles prefix: h2o_sto_3gc-task-0 
+ Optimization ...
+ ---Start--- 
+ Initial parameters 
+ Maximum number of SCF: 100
+ Default SCF tolerance: 0.000000
+ Initial density matrix: None
+ Maximum number of optimization steps (Hardcoded): 30
+ Tolerance in jac infinity norm (Hardcoded): 0.100000 
+ Tolerance in energy (Hardcoded): 0.000010 
+ Atomic coordinates
+  O 1 8 0.0 0.0 0.0916858011029
+  H 2 1 1.42296788349 0.0 -0.981209549317
+  H 3 1 -1.42296788349 0.0 -0.981209549317
+ Basis functions
+  1 0.000000 0.000000 0.091686 s 130.709320 0 0 0
+  2 0.000000 0.000000 0.091686 s 23.808861 0 0 0
+  3 0.000000 0.000000 0.091686 p 6.443608 1 0 0
+  4 0.000000 0.000000 0.091686 p 5.033151 0 1 0
+  5 0.000000 0.000000 0.091686 p 1.169596 0 0 1
+  6 1.422968 0.000000 -0.981210 s 0.380389 0 0 0
+  7 -1.422968 0.000000 -0.981210 s 5.033151 0 0 0
+
