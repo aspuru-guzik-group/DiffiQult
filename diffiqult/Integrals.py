@@ -7,8 +7,6 @@ import numpy as np
 import algopy
 from algopy import UTPM, zeros
 
-
-
 def overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype):
     S = algopy.zeros((nbasis,nbasis),dtype=dtype)
     cont_i = 0
@@ -508,3 +506,32 @@ def normalization(alpha,c,l,list_contr,dtype=np.float64(1.0)):
             coef[i] = coef[i]/tmp
        contr = contr + ci
     return coef
+
+
+def AO_to_MO(integral,MO_coef):
+    '''This function returns the MO-Eris in form a vector, 
+    to get an element of the eris tensor, use eri_index, 
+    included in Tools'''
+    ### NOTE: YOU CAN REPLACE A VALUE OF THE ARRAY!!!
+    vec_size = nbasis*(nbasis**3 + 2*nbasis**2 + 3*nbasis + 2)/8 ## Vector size
+    Eri_vec = algopy.zeros((vec_size,),dtype=dtype)
+    len_vec = nbasis*(nbasis + 1)/2
+    for x in range(len_vec):
+        i,j = vec_tomatrix(x,nbasis)
+        contr_i_i = sum(contr_list[0:i])
+        contr_i_f = sum(contr_list[0:i+1])
+        contr_j_i = sum(contr_list[0:j])
+        contr_j_f = sum(contr_list[0:j+1])
+        for y in range(x,len_vec) :
+             k,m = vec_tomatrix(y,nbasis)
+             contr_m_i = sum(contr_list[0:m])
+             contr_m_f = sum(contr_list[0:m+1])
+             contr_k_i = sum(contr_list[0:k])
+             contr_k_f = sum(contr_list[0:k+1])
+             index = matrix_tovector(x,y,len_vec)
+             Eri_vec[index] = eri_contracted(
+                                         alpha[contr_i_i:contr_i_f],coef[contr_i_i:contr_i_f],xyz[i],l[i],
+                                         alpha[contr_j_i:contr_j_f],coef[contr_j_i:contr_j_f],xyz[j],l[j],
+                                         alpha[contr_k_i:contr_k_f],coef[contr_k_i:contr_k_f],xyz[k],l[k],
+                                         alpha[contr_m_i:contr_m_f],coef[contr_m_i:contr_m_f],xyz[m],l[m])
+    return Eri_vec

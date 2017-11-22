@@ -140,21 +140,14 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
     E_step = []
     for scf_iter in range(max_scf):
         if eigen:
-<<<<<<< HEAD
            Fprime = algopy.dot(algopy.dot(SqrtST,F), SqrtS)
            eigsysFockOp = eigensolver(Fprime)
            Cprime = eigsysFockOp[1]
            C = algopy.dot(SqrtS, Cprime)
-=======
-           print 'F',F
            Fprime = algopy.dot(algopy.dot(SqrtST,F), SqrtS)
-           print 'Fprime',Fprime
            eigsysFockOp = eigensolver(Fprime)
            Cprime = eigsysFockOp[1]
-           print 'Cprime',Cprime
            C = algopy.dot(SqrtS, Cprime)
-           print C
->>>>>>> 0d082444eb6643faf955ac9ab6718e1dc8bd5613
            D = algopy.zeros((nbasis,nbasis),dtype=dtype)
            for i in range(nbasis):
               for j in range(nbasis):
@@ -173,17 +166,21 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
         E_elec = algopy.sum(np.multiply(D,Hcore+F))
         E_step.append(E_elec)
         E_nuc = nuclearrepulsion(xyz_atom,charges,natoms)
-        #print 'Step: '+str(scf_iter)+str(E_elec+E_nuc)
-        #print 'One-e',algopy.sum(np.multiply(D,Hcore))
-        #print 'Two-e',algopy.sum(np.multiply(D,F-Hcore))
         if np.absolute(E_elec - OldE) < tool:
            status = True 
-           print 'Step: '+str(scf_iter)+' '+str(E_elec)
            break
         OldE = E_elec
     E_nuc = nuclearrepulsion(xyz_atom,charges,natoms)
     if printguess !=None:
         np.save(printguess, C)
+
+    def update_system():
+       mol.energy = E_elec + E_nuc
+       mol.erepulsion = Eri
+       mol.hcore = Hcore
+       mol.mo_coeff = C
+       return 
+            
 
     def write_molden():
        import Data
@@ -203,11 +200,6 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
        for i, step in enumerate(E_step):
            line = 'Step: '+str(i)+' '+str(step)
            tape.write(line+'\n')
-
-       ### Fock Matrix
-       ###tape.write('[FM] \n')
-       ###tape.write('Fock Matrix\n')
-       ###printmatrix(F,tape)
 
        ### C Matrix
        tape.write('[CM] \n')
@@ -296,6 +288,7 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
       if write:
          tape = open(name+'.molden',"w")
          write_molden()
+         #update_system()
          tape.close()
     else:
        print('E_elec: '+str(E_elec)+'\n')

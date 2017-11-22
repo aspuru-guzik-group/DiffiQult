@@ -1,0 +1,63 @@
+ *************************************************
+ DiffiQult Ago 2017
+ Author: Teresa Tamayo Mendoza 
+ *************************************************
+
+ Starting at Thu Nov 16 17:29:20 2017
+ -------------------------------------------------------- 
+ Task: Energy 
+
+ Output molden file: h2_sto_3g-1 
+ Single point ...
+ ---Start--- 
+ Initial parameters 
+ Maximum number of SCF: 50
+ Default SCF tolerance: 0.000000
+ Initial density matrix: None
+ Atomic coordinates
+  H 1 1 0.0 0.0 0.20165898
+  H 2 1 0.0 0.0 -1.64601435
+ Basis functions
+  1 0.000000 0.000000 0.201659 s 3.425251 0 0 0
+  2 0.000000 0.000000 -1.646014 s 0.623914 0 0 0
+
+ ---End--- 
+ Time 0.1122490 :
+ SCF converged!!
+ Energy: -1.0722613 
+ -------------------------------------------------------- 
+ Task: Opt 
+
+ Outputfiles prefix: h2_sto_3g-task-0 
+ Optimization ...
+ ---Start--- 
+ Initial parameters 
+ Maximum number of SCF: 50
+ Default SCF tolerance: 0.000000
+ Initial density matrix: None
+ Maximum number of optimization steps: (FIX ME)30
+ Tolerance in jac infinity norm (Hardcoded): 0.100000 
+ Tolerance in energy (Hardcoded): 0.000010 
+ Atomic coordinates
+  H 1 1 0.0 0.0 0.20165898
+  H 2 1 0.0 0.0 -1.64601435
+ Basis functions
+  1 0.000000 0.000000 0.201659 s 3.425251 0 0 0
+  2 0.000000 0.000000 -1.646014 s 0.623914 0 0 0
+
+ ---End--- 
+ Time 321.2370670 :
+ Message: Optimization terminated successfully.
+ Current energy: -1.092859
+ Current gradient  0.000008 
+ Number of iterations 24 
+ Atomic coordinates
+  H 1 1 0.0 0.0 0.20165898
+  H 2 1 0.0 0.0 -1.64601435
+ Basis functions
+  1 0.000000 0.000000 0.201659 s 2.755749 0 0 0
+  2 0.000000 0.000000 -1.646014 s 0.488186 0 0 0
+
+ Finishing at Thu Nov 16 17:34:43 2017 
+ *************************************************
+

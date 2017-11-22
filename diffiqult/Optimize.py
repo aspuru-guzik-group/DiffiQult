@@ -34,8 +34,7 @@ from numpy import (atleast_1d, eye, mgrid, argmin, zeros, shape, squeeze,
                    vectorize, asarray, sqrt, Inf, asfarray, isinf)
 import numpy as np
 
-import Linesearch
-from Linesearch import (line_search_wolfe1, line_search_wolfe2,
+from diffiqult.Linesearch import (line_search_wolfe1, line_search_wolfe2,
                          line_search_wolfe2 as line_search,
                          LineSearchWarning)
 from scipy._lib._util import getargspec_no_self as _getargspec
@@ -293,11 +292,13 @@ def wrap_function(function, args, argnum=None, vec=None,print_out=False,name=Non
             return function(*(wrapper_args + args))
         else:
             split = []
-            num = 1.0
+            num = 1
             for i in vec:
                for j in i:
                    num *= j
                split.append(num)
+            print(wrapper_args)
+            print(split)
             x = np.split(wrapper_args,split)
             args1 = []
             index = 0
@@ -893,6 +894,7 @@ def _minimize_bfgs(fun, x0, args=(), argnum=None, jac=None, callback=None, name=
     if maxiter is None:
         maxiter = len(x0) * 200
                
+    print(args,argnum)
     func_calls, f = wrap_function(f, args,argnum, vec=vec)
     fcall, fprint = wrap_function(f, args,argnum, vec=vec,print_out=True)
     
@@ -903,7 +905,7 @@ def _minimize_bfgs(fun, x0, args=(), argnum=None, jac=None, callback=None, name=
   
     val = 100.0
     gfk = myfprime(x0)
-    print(gfk)
+    print('gfk',gfk)
     k = 0 
     N = len(x0)
     I = numpy.eye(N, dtype=int)

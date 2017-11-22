@@ -49,7 +49,7 @@ class Gradients(object):
 
 
      def _algo_hessfun(self,function,args,argnum):
-         '''This function returns a list with functions that extracts the hessian of the values
+         '''DoThis function returns a list with functions that extracts the hessian of the values
          defined by args, args has the position of the inputs of energy '''
          grad_fun =[]
          def function_builder(narg):
@@ -66,11 +66,11 @@ class Gradients(object):
 	 return grad_fun
 
 
-class Autochem(object):
+class Tasks(object):
      ''' This class manage several tasks'''
-     def __init__(self,mol,basis_set,ne,name,verbose=False,shifted=False):
-	  self.sys = System_mol(mol,basis_set,ne,'Molecule',shifted=shifted)
+     def __init__(self,mol,name,verbose=False):
           self.name = name
+          self.sys = mol
 	  self.verbose = verbose
           self.status = True
 	  if verbose:
@@ -80,13 +80,12 @@ class Autochem(object):
               "Energy": self.energy,
               "Opt": self.optimization,
               "Grad": self.energy_gradss,
-              #"Objective": objective,
-              "Dipole": self.dipole
           }
           self.select_method ={
               'BFGS': self._BFGS,
-              'Newton': Newton,
+              #'Newton': Newton,
           }
+          self.ntask = 0
           return
 
      def _printheader(self):
@@ -139,7 +138,7 @@ class Autochem(object):
            self.tape.write(' Time %3.7f :\n'%timer)
        return grad
   
-     def _singlepoint(self,max_scf=300,max_d=300,printguess=None,name='Output.molden',output=False):
+     def _singlepoint(self,max_scf=300,max_d=300,printcoef=False,name='Output.molden',output=False):
           '''This function calculates a single point energy
           max_scf -> Maximum number of SCF cycles
           max_d ->  Maximum cycles of iterations if cannonical purification
@@ -149,7 +148,7 @@ class Autochem(object):
           readguess = False #By now, we are stating the densisty matrix from scratch
 
        	  rguess = None
-          if printguess:
+          if printcoef:
              pguess = name+'.npy'
           else:
              pguess = None
@@ -216,6 +215,8 @@ class Autochem(object):
                 diff_args[narg] = var
                 diff_args[-1]= var
                 diff_args = tuple(diff_args)
+
+                print UTPM.extract_jacobian(rhfenergy(*(diff_args)))
                 return UTPM.extract_jacobian(rhfenergy(*(diff_args)))
             return algo_jaco
          for i in argnum:
@@ -278,15 +279,12 @@ class Autochem(object):
           self.sys.printcurrentgeombasis(self.tape)
 
      def _optimization(self,max_scf=100,log=True,scf=True,readguess=None,argnum=[0],taskname='Output', method='BFGS',penalize=None,**otherargs):
-          print 'alpha',self.sys.alpha
           name=taskname
           record = False
           maxsteps = 100
           rhf_old = 1000
           grad_fun = []
           lbda = 1.0
-          ##`alpha = np.array(Basis.alpha)        # alpha
-          ## optimizing from a guess.
           rguess = None
           if readguess:
              pguess = name +'.npy'
@@ -330,29 +328,29 @@ class Autochem(object):
         name = self.name+'-task-'+str(ntask)
         if self.verbose:
            self.tape.write(' Outputfiles prefix: %s'%name)
-        res,timer = self._optimization(max_scf,log,scf,readguess,argnum[ntask],taskname=name,**kwargs)
+        print(argnum)
+        res,timer = self._optimization(max_scf,log,scf,readguess,argnum,taskname=name,**kwargs)
         if self.verbose:
                self._optprintres(res,timer)
           
-	#except:
-	#    self.tape.write('An error occured in the Optimization \n')
         return
 
 
-     def energy(self,ntask=0,max_scf=300,max_d=300,printguess=None,output=False,**kwargs):
+     def energy(self,max_scf=300,max_d=300,printguess=None,output=False,**kwargs):
         '''This function handdles the single point calculations '''
-        name = self.name+'-'+str(ntask)
+        name = self.name+'-'+str(self.ntask)
         if self.verbose:
            self.tape.write(' Output molden file: %s'%name)
         self._singlepoint(max_scf,max_d,printguess,name,output)
         return
 
-     def runtask(self,task,ntask=0,**kwargs):
+     def runtask(self,task,**kwargs):
+        self.ntask += 1
         self.tape.write(' -------------------------------------------------------- \n')
         self.tape.write(' Task: %s \n'%task)
     	function = self._select_task.get(task,lambda: self.tape.write(' This task is not implemented\n'))
         self.tape.write('\n')
-	function(ntask,**kwargs)
+	function(**kwargs)
 
      def end(self):
         if self.verbose:
@@ -361,15 +359,46 @@ class Autochem(object):
 	return
 	 
 
-def autochem(tasks,mol,basis_set,ne,name='Output',verbose=True,shifted=False,**kwargs):
-#max_scf=300,max_d=300,verbose=False,tol=1e-10,scf=False,name='Output',scfout=False,argnum=[0],
-#               printguess=False,readguess=False,shifted=False,method='BFGS',alpha=None,penalize=None,log=True):
+def main():
+     from Basis import basis_set_3G_STO as basis
+     d = -1.64601435
+     mol = [(1,(0.0,0.0,0.20165898)),(1,(0.0,0.0,d))]
+     ne = 2
+    
+     system = System_mol(mol,                                ## Geometry
+                         basis,                              ## Basis set (if shifted it should have the coordinates too)
+                         ne,                                 ## Number of electrons
+                         shifted=False,                      ## If the basis is going to be on the atoms coordinates 
+                         angs=False,                         ## Units -> Bohr
+                         mol_name='agua')                    ## Units -> Bohr
+ 
+     manager = Tasks(system,
+                     name='h2_sto_3g',      ## Prefix for all optput files
+                     verbose=False)          ## If there is going to be an output
 
-     adchem = Autochem(mol,basis_set,ne,name,verbose,shifted=shifted)
-     for i,task in enumerate(tasks):
-         adchem.runtask(task, ntask = i,**kwargs)
-         if not adchem.status:
-            break
-     adchem.end()
-     return adchem
-         
+    
+     manager.runtask('Energy',
+                     max_scf=50,
+                     printcoef=True,
+                     name='Output.molden',
+                     output=False)
+
+     manager.runtask('Opt',
+                     max_scf=50,
+                     printcoef=False,
+                     argnum=[0],
+                     output=False)
+
+     manager.runtask('Opt',
+                     max_scf=50,
+                     printcoef=False,
+                     argnum=[1],
+                     output=False)
+
+     manager.end()
+     return
+
+
+if __name__ == "__main__":
+     main()
+

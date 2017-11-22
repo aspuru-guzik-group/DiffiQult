@@ -1,9 +1,10 @@
 """
-=============================================================
-=============================================================
+=================================================================
+TODO
+  DiffiQult: an autodifferentiable electronic structure package
+==================================================================
 Description:
 Rationale:
-    but rather that you can write code that can be evaluated with or without AlgoPy.
 How to cite DiffiQulT::
     
 """
@@ -14,7 +15,6 @@ __install_path__ = os.path.realpath(__file__)
 
 # check that dependencies are satisfied
 
-from ._npversion import NumpyVersion
 
 _min_numpy_version = '1.5.0'
 _preferred_numpy_version = '1.6.2'
@@ -22,6 +22,7 @@ _min_scipy_version = '0.11.0'
 
 try:
     import numpy
+    from numpy.lib import NumpyVersion
 
     # ignore warnings "ComplexWarning: Casting complex values to real discards the imaginary part"
     import warnings
@@ -30,7 +31,6 @@ try:
 except ImportError as e:
     raise ImportError(
             "NumPy import error (%s)\n"
-            "NumPy is a requirement of AlgoPy.\n"
             "Please install NumPy >= %s" % (e, _preferred_numpy_version))
 
 if NumpyVersion(numpy.version.version) < _min_numpy_version:
@@ -44,7 +44,6 @@ try:
 except ImportError as e:
     raise ImportError(
         "SciPy import error (%s)\n"
-        "SciPy is a requirement of AlgoPy.\n"
         "Please install SciPy >= " + _min_scipy_version)
 
 if NumpyVersion(scipy.version.version) < _min_scipy_version:
@@ -60,13 +59,13 @@ except ImportError as e:
     raise ImportError(
         "algopy import error (%s)\n"
         "algopy is a requirement of DiffiQulT.\n"
-        "Please install algopy"
+        "Please install algopy")
 
 # testing
 from numpy.testing import Tester
 test = Tester().test
 
 # import standard submodules and important classes/functions
-import Task
-from Task import Gradients, Diffiqult
+from Task import Tasks,Gradients
+from Molecule import System_mol
 

@@ -62,7 +62,7 @@ class System_mol():
     '''This class contains all the information of the system
     extracted from mol and basis'''
 
-    def __init__(self,mol,basis_set,ne,mol_name,angs=False,shifted=False):
+    def __init__(self,mol,basis_set,ne,mol_name='molecule',angs=False,shifted=False):
 
           self.mol_name = mol_name
           ## Info for basis
@@ -83,11 +83,12 @@ class System_mol():
           self.coef = np.array(Basis.coef)
   
           ## Number of electrons
-          self.ne = ne
+          self.ne = int(ne/2)
           if angs:
              factor = 0.529177249
              self.xyz = factor*self.xyz
              self.atom = factor*self.atom
+          print(self.ne)
           return
 
     def printcurrentgeombasis(self,tape):
