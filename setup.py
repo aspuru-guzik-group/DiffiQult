@@ -63,7 +63,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='algorithm differentiation', 'hartree fock', 'quantum chemistry', 'floating gausiamns', 'basis optimization',
+    keywords=['algorithm differentiation', 'hartree fock', 'quantum chemistry', 'floating gausiamns', 'basis optimization'],
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -89,3 +89,6 @@ setup(
     }
 
 )
+
+python_requires='>=2.6, !=3.0.*, !=3.1.*, !=3.2.*, <4'
+
