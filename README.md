@@ -1,9 +1,7 @@
 # DiffiQult
 
-A fully autodifferentiable Hatree-Fock algorithm.
+A fully autodifferentiable Hatree-Fock algorithm capable of optimizing any parameter of the basis set.
 
-DiffiQult is an electronic structure software package. 
- 
 
 # Requirements
 
