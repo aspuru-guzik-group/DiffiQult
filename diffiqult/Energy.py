@@ -15,8 +15,6 @@ This module contains functions to obtain energy
 
 def mo_naturalorbital(D):
     eigsys = eigensolver(D)
-    print eigsys[0]
-    print eigsys[1]
     return [eigsys[0]] 
     
 
@@ -94,20 +92,16 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
     else:
     	alpha = alpha_old
 
-    if type(alpha) != np.ndarray: ## Cover the case of diff xyz atom
-        coef = normalization(alpha,coef2,l,contr_list,dtype=dtype)
-    else:
-        coef = normalization(alpha,coef2,l,contr_list,dtype=np.float64(1.0))
-    
-    V = nuclearmatrix(alpha,coef,xyz,l,nbasis,charges,xyz_atom,natoms,contr_list,dtype=dtype)
     if type(xyz_atom) != np.ndarray: ## Cover the case of diff xyz atom
-        dtypef = np.float64(1.0)
-        S = overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtypef)
-        T = kineticmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtypef)
-        Eri = erivector(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtypef)
-   
+        coef = normalization(alpha,coef2,l,contr_list,dtype= np.float64(1.0))
+        V = nuclearmatrix(alpha,coef,xyz,l,nbasis,charges,xyz_atom,natoms,contr_list,dtype=dtype)
+        S = overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=np.float64(1.0))
+        T = kineticmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=np.float64(1.0))
+        Eri = erivector(alpha,coef,xyz,l,nbasis,contr_list,dtype=np.float(1.0))
     else:
+        coef = normalization(alpha,coef2,l,contr_list,dtype=dtype)
         S = overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtype)
+        V = nuclearmatrix(alpha,coef,xyz,l,nbasis,charges,xyz_atom,natoms,contr_list,dtype=dtype)
         T = kineticmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtype)
         Eri = erivector(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtype)
     Hcore = T + V
@@ -122,7 +116,6 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
        Sinv = np.linalg.inv(S)
  
     if readguess != None:
-        #print 'Reading previous guess'+readguess
 	C = np.load(readguess)
         D = np.zeros((nbasis,nbasis))
         for i in range(nbasis):
@@ -261,7 +254,7 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
        for i,ci in enumerate(contr_list):
           tape.write('  '+str(i+1+natoms)+'  0\n')
           if np.sum(l[i]) == 0 :
-             tape.write(' s   '+str(ci)+' 1.0 '+ str(l[i][0])+' '+str(l[i][1])+' '+str(l[i][2])+'\n')
+            tape.write(' s   '+str(ci)+' 1.0 '+ str(l[i][0])+' '+str(l[i][1])+' '+str(l[i][2])+'\n')
           else:
              tape.write(' p   '+str(ci)+' 1.0 '+ str(l[i][0])+' '+str(l[i][1])+' '+str(l[i][2])+'\n')
              #tape.write(' p   '+str(1)+' 1.0 '+ str(l[i])+'\n')
@@ -288,13 +281,12 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
       if write:
          tape = open(name+'.molden',"w")
          write_molden()
-         #update_system()
          tape.close()
     else:
        print('E_elec: '+str(E_elec)+'\n')
        print('E_nuc: '+str(E_nuc)+'\n')
        print('E_tot: '+str(E_nuc+E_elec)+'\n')
-       print 'SCF DID NOT CONVERGED'
+       print('SCF DID NOT CONVERGED')
        return 99999
      
     return E_elec+E_nuc
@@ -311,8 +303,6 @@ def penalty_inverse(alpha,coef3,x,y,z,l,charges,x_atom,y_atom,z_atom,natoms,nbas
     coef = np.ones(nbasis,dtype=dtype)
     coef = normalization(alpha,coef,l,nbasis)
     S = overlapmatrix2(alpha,coef,l,nbasis)
-    #print 'This is det S',np.linalg.det(S)
-    print 'This is eigen S',np.linalg.eigh(S)[0]
     penalty = lbda*1.0e-3/np.sqrt(np.linalg.det(S))
     return energy + penalty
 

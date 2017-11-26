@@ -1,19 +1,5 @@
-#__docformat__ = "restructuredtext en"
-# ******NOTICE***************
-# optimize.py module by Travis E. Oliphant
-#
-# You may copy and use this module as you see fit with no
-# guarantee implied provided you keep this notice in all copies.
-# *****END NOTICE************
-
-# A collection of optimization algorithms.  Version 0.5
-# CHANGES
-#  Added fminbound (July 2001)
-#  Added brute (Aug. 2002)
-#  Finished line search satisfying strong Wolfe conditions (Mar. 2004)
-#  Updated strong Wolfe conditions line search to use
-#      cubic-interpolation (Mar. 2004)
-
+''' This module was taken from scipy and modified to optimize
+several parameters at a time with the BFGS Minimization '''
 from __future__ import division, print_function, absolute_import
 
 
@@ -297,8 +283,6 @@ def wrap_function(function, args, argnum=None, vec=None,print_out=False,name=Non
                for j in i:
                    num *= j
                split.append(num)
-            print(wrapper_args)
-            print(split)
             x = np.split(wrapper_args,split)
             args1 = []
             index = 0
@@ -315,7 +299,6 @@ def wrap_function(function, args, argnum=None, vec=None,print_out=False,name=Non
                args1[len(args1)-3] = name ## Give the root for naming outputs.
             args1 = tuple(args1)
             value = function(*(args1))
-            print(value)
             return value #np.transpose(value)
     return ncalls, function_wrapper
 
@@ -326,17 +309,12 @@ def wrap_functions(fprimes,args,argnum=None,vec=None):
     for fprime in fprimes:
        g_c, myfp = wrap_function(fprime, args,argnum,print_out=False, vec=vec)
        grad_calls.append(g_c)
-       #print ('fprime',fprime,myfp)
        myfprime.append(myfp)
     def gradients(x):
        ncalls[0] += 1
-       #print ('myprime',myfprime)
        grad = []
        for function in myfprime:
            grad.append(np.array(function(x)))
-           #print ('jjjjj',myfprime,function,np.array(function(x)),function(x))
-           #print ('grad in the loop',grad)
-       #print ('grad in wfs',grad)
        if (len(grad)==1): return np.reshape(grad,(len(grad[0]),))
        grad= numpy.concatenate(grad)
        return np.reshape(grad,(grad.shape[0],))
@@ -894,7 +872,6 @@ def _minimize_bfgs(fun, x0, args=(), argnum=None, jac=None, callback=None, name=
     if maxiter is None:
         maxiter = len(x0) * 200
                
-    print(args,argnum)
     func_calls, f = wrap_function(f, args,argnum, vec=vec)
     fcall, fprint = wrap_function(f, args,argnum, vec=vec,print_out=True)
     
@@ -905,18 +882,18 @@ def _minimize_bfgs(fun, x0, args=(), argnum=None, jac=None, callback=None, name=
   
     val = 100.0
     gfk = myfprime(x0)
-    print('gfk',gfk)
     k = 0 
     N = len(x0)
     I = numpy.eye(N, dtype=int)
     Hk = I
-    old_old_fval = None
     xk = x0
     if retall:
         allvecs = [x0]
     sk = [2 * gtol]
     warnflag = 0
     gnorm = vecnorm(gfk, ord=np.inf)
+    old_old_fval = None
+    print ('gfk: ',gfk)
     while (gnorm > gtol) and (k < maxiter):
         old_fval = f(xk,print_out=True,name=str(name)+'-BFGS_step_'+str(k))
         print ('STEP: ',k, old_fval)
@@ -928,7 +905,6 @@ def _minimize_bfgs(fun, x0, args=(), argnum=None, jac=None, callback=None, name=
                      _line_search_wolfe12(f, myfprime, xk, pk, gfk,
                                           old_fval, old_old_fval, xtol=xtol_linew)
         except _LineSearchError:
-            # Line search failed to find a better solution.
             warnflag = 2
             break
 

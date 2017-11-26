@@ -1,19 +1,18 @@
 import unittest
-import sys
-sys.path.insert(0, '../')
-from Task import autochem
-from Molecule import System_mol,Getbasis, Getgeom
-from Integrals import overlapmatrix, normalization, nuclearmatrix, kineticmatrix, erivector
-from Basis import basis_set3, sto3g_contracted 
+from diffiqult import Task 
+from diffiqult.Molecule import System_mol, Getbasis,Getgeom
+from diffiqult.Integrals import overlapmatrix, normalization, nuclearmatrix, kineticmatrix, erivector
+from diffiqult.Basis import basis_set_3G_STO 
+from diffiqult.Tools import getgammp,eri_index, matrix_tovector
+
 import algopy 
 from algopy import UTPM, zeros
+
 import numpy as np
 from numpy.testing import assert_approx_equal
+
 import scipy
 from scipy.special import gammainc,gamma
-import Tools
-from Tools import getgammp,eri_index, matrix_tovector
-import unittest
 
 '''
 This module contains test functions
@@ -162,10 +161,9 @@ select_basis = {'h2' : basis_set,
                'hf'  : basis_set,
                'h2o' : basis_set,
                'ch4' : basis_set,
-               'ch2o': sto3g_contracted,
+               'ch2o': basis_set_3G_STO,
                'hcn' : basis_set}
 test_mol_names = ['h2','h2o','ch4','hcn']
-test_mol_names = ['ch2o']#,'h2','h2o','ch4','hcn']
 
 
 
@@ -175,11 +173,10 @@ class System_test(System_mol):
           System_mol.__init__(self,self.mol,select_basis.get(mol),select_e.get(mol),mol)
           self.tape = "./test/"+mol
           self.energy = select_energy.get(mol)
-          self.coef = normalization(np.array(self.alpha),self.coef,self.xyz,self.l,self.list_contr)
+          self.coef = normalization(np.array(self.alpha),self.coef,self.l,self.list_contr)
           #coef = normalization(np.array(self.alpha),np.copy(self.coef),self.xyz,self.l,self.list_contr)
           self.alpha_algopy = UTPM.init_jacobian(self.alpha)
           self.coef_algopy = UTPM.init_jacobian(self.coef)
-
           return 
          
         
