@@ -16,10 +16,43 @@ This module contain manages all tasks:
 '''
 
 class Tasks(object):
-     ''' This class manage the implemented tasks over a system included
-         in DiffiQult
+     '''This class manage the implemented tasks over a system included
+        in DiffiQult
+
+        Attributes
+        __________
+        
+        sys  : System_mol object
+               Contains the basis functions, geometry and information of the a molecular system.
+        name : string
+               An id of the task, it is used as prefix for outputs
+        verbose: bool
+               It defines the output and screen options
+               True it prints in screen all details and a file "name.out"
+        status: bool
+               Keep track of the success of the different task.
+               True the SCF and/or the optimization converged
+
      '''
      def __init__(self,mol,name,verbose=False):
+          '''
+          Initialize molecular metadata which defines class.
+
+          Parameters
+	  __________
+             mol  : System_mol object
+                    Contains the basis functions, geometry and information of the a molecular system.
+             name : string
+                    An id of the task, it is used as prefix for outputs
+          Options
+	  __________
+             verbose : bool
+                     It defines the output and screen options
+                     True it prints in screen all details and a file "name.out"
+             status: bool
+                     Keep track of the success of the different task.
+                     True the SCF and/or the optimization converged
+          '''
           self.name = name
           self.sys = mol
 	  self.verbose = verbose
@@ -39,7 +72,7 @@ class Tasks(object):
           return
 
      def _printheader(self):
-	 '''This function prints the header of the outputfile'''
+	 """This function prints the header of the outputfile"""
          self.tape.write(' *************************************************\n')
          self.tape.write(' DiffiQult Ago 2017\n')
          self.tape.write(' Author: Teresa Tamayo Mendoza \n')
@@ -56,8 +89,8 @@ class Tasks(object):
 	 return
 
 
-     def energy_gradss(self,argnum,max_scf=301,max_d=300,printguess=None,name='Output.molden',output=False,order='first'):
-       '''This function returns the gradient of args'''
+     def _energy_gradss(self,argnum,max_scf=301,max_d=300,printguess=None,name='Output.molden',output=False,order='first'):
+       """This function returns the gradient of args"""
        ## For the moment it retuns a value at a time
        ## This is used only by testing functions.
        eigen = True
@@ -89,10 +122,11 @@ class Tasks(object):
        return grad
   
      def _singlepoint(self,max_scf=300,max_d=300,printcoef=False,name='Output.molden',output=False):
-          '''This function calculates a single point energy
+          """
+          This function calculates a single point energy
           max_scf -> Maximum number of SCF cycles
           max_d ->  Maximum cycles of iterations if cannonical purification
-          '''
+          """
           log = True # We are not using logarithms of alphas
           eigen = True # We are using diagonalizations
           readguess = False #By now, we are stating the densisty matrix from scratch
@@ -149,7 +183,7 @@ class Tasks(object):
 
 
      def _BFGS(self,ene_function,grad_fun,args,argnums,log,name,**kwargs):
-          ''' This function use the BFGS method implemented intialially in scipy to perform the optimization'''
+          """ This function use the BFGS method implemented intialially in scipy to perform the optimization """
           print('Minimizing BFGS ...')
           G = False
           var = [args[i] for i in argnums] ## Arguments to optimize
@@ -166,8 +200,9 @@ class Tasks(object):
           return terms 
 
      def _algo_gradfun(self,function,args,argnum):
-         '''This function returns a list with functions that extracts the gradient of the values
-         defined by args, args has the position of the inputs of energy '''
+         """This function returns a list with functions that extracts the gradient of the values
+         defined by args, args has the position of the inputs of energy
+         """
          grad_fun =[]
          def function_builder(narg):
             def algo_jaco(*args, **kwargs):
@@ -276,26 +311,59 @@ class Tasks(object):
           return res,timer
 
      def dipole(self,coef_file=None,max_scf=100,name='Output',**kwargs):
+         # Pending unit tests
          if coef_file == None:
              coef_file = name
              ene = self._singlepoint(max_scf,max_scf,coef_file,name,False)
          dipolemoment(self.sys,coef_file+'.npy')
 	 return
 
-     def optimization(self,ntask=0,max_scf=100,log=True,scf=True,name='Output',readguess=None,output=False,argnum=[0],**kwargs):
-        '''This function handdles the single point calculations '''
-        name = self.name+'-task-'+str(ntask)
+     def optimization(self,max_scf=100,log=True,scf=True,name='Output',readguess=None,output=False,argnum=[0],**kwargs):
+        '''
+        This function handdles the optimization procedure 
+
+        Parameters
+        __________
+        argnum : list of integers
+                Parameter to optimize
+                0 widths
+                1 contraction coefficients
+                2 Gaussian centers
+                e.g. [0,1] to optimized widhts and contraction coefficients
+        max_scf : integer
+                 maximum number of scf steps, default 30
+        log     : bool
+                 If we are not optimizing the log of exponent, we highly recoment leave it as True, the default.
+        name    : str
+                 Output file name default Output
+        readguess : str
+                 File path to a npy file in case on predefined initial guess of the density matrix  
+        output : bool
+                 True if it will print a molden file in case of success
+                 
+        '''
+        name = self.name+'-task-'+str(self.ntask)
         if self.verbose:
            self.tape.write(' Outputfiles prefix: %s'%name)
         res,timer = self._optimization(max_scf,log,scf,readguess,argnum,taskname=name,**kwargs)
         if self.verbose:
                self._optprintres(res,timer)
-          
         return
 
 
-     def energy(self,max_scf=300,max_d=300,printguess=None,output=False,**kwargs):
-        '''This function handdles the single point calculations '''
+     def energy(self,max_scf=30,max_d=300,printguess=None,output=False,**kwargs):
+        '''
+        This function handdles the single point calculations
+
+        Parameters
+        __________
+        max_scf : integer
+                 maximum number of scf steps, default 30
+        printguess : str 
+                 file path if it is requiered to prepare an inital guess for the molecular orbital coefficients
+        output : bool
+                 True if it will print a molden file in case of success
+        '''
         name = self.name+'-'+str(self.ntask)
         if self.verbose:
            self.tape.write(' Output molden file: %s'%name)
@@ -303,6 +371,20 @@ class Tasks(object):
         return
 
      def runtask(self,task,**kwargs):
+        ''' 
+         This method run a given task and if it has success, it uptates system with the most recent energy value and basis function
+
+        Parameters
+        _________
+        task : str
+               If defines the task:
+              'Energy' is a single point calculation     
+              'Opt' an optimization of a given parameter
+        Returns
+        _________
+        success : bool
+                 True if task ended successfully
+        '''
         print(' Task: %s'%task)
         self.ntask += 1
         if self.verbose:
@@ -312,6 +394,7 @@ class Tasks(object):
         if self.verbose:
             self.tape.write('\n')
 	function(**kwargs)
+        return self.success
 
      def end(self):
         if self.verbose:

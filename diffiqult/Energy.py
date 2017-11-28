@@ -74,15 +74,46 @@ def newdensity(F,Sinv,nbasis,ne):
 
 def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne,max_scf,max_d,log,eigen,printguess,readguess,name,write,dtype):
     '''
-    Here will be the rhf function
-    eigen = False -> Canonical Purification
-    tape = name -> Tape for recording
-    record = bool -> Are we recording?
-    readguess -> are we reading a guess?, name of the file
-    printguess -> are we creating a guess?, name of the file
-    name -> Name of record (it must be -3)
-    write -> Record output.molden (it must be -2)
-    dtype -> type of var to differentiate for Algopy empty matrices
+    This function returns the rhf function
+    Parameters
+    ------------
+    alpha_old : array
+                Gaussian exponents
+    coef2     : array
+                Contraction coeffients
+    xyz       : array 3N
+                Gaussian centers
+    l         : array 3N
+                Angular momentum each entry is a vector
+                eg. s orbital (0,0,0) or pz (1,0,0)
+    charges   : array
+                Atom charges
+    nbasis    : int
+                Number of basis
+    contr_list: list of integers
+                Specify the number of orbitals in each atom
+    ne        : int
+                Number of electrons
+    max_scf   : int
+                maximum number of scf cycles
+    log       : bool
+                The exponents are given in log
+    printguess: str or None
+                File to print coeff matrix initial guess
+    readguess : str or None
+                File that contains coeff matrix initial guess
+    name      : str
+                Output file name
+    write     : bool
+                True if printing
+    dtype     : type of output
+                This is the directive to know if algopy will be used or not
+                np.float64(1.0) if it is a single point calculation
+                otherwise, it specify the size of the UTMP, autodifferentiation
+    Returns
+    _______
+    energy    : float
+                RHF energy
     '''
     tool_D = 1e-8
     tool = 1e-8
@@ -277,11 +308,13 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
           for i in range(nbasis):
               tape.write(str(i+1+natoms)+' '+str(C[i,j])+'\n')
 
+
     if status:
       if write:
          tape = open(name+'.molden',"w")
          write_molden()
          tape.close()
+         return E_elec+E_nuc
     else:
        print('E_elec: '+str(E_elec)+'\n')
        print('E_nuc: '+str(E_nuc)+'\n')

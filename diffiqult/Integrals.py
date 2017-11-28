@@ -20,7 +20,6 @@ def overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype):
     return S
 
 def overlap_contracted(alphas,coefa,xyza,la,betas,coefb,xyzb,lb):
-    '''This version '''
     s = 0
     for i in range(len(alphas)):
         for j in range(len(betas)):
@@ -63,7 +62,6 @@ def nuclearmatrix(alpha,coef,xyz,l,nbasis,charge,atoms,numatoms,contr_list,dtype
     return V
 
 def nuclear_contracted(alphas,coefa,xyza,la,betas,coefb,xyzb,lb,atoms,charge,numatoms):
-    '''This version '''
     v = 0
     for i in range(len(alphas)):
         for j in range(len(betas)):
@@ -75,7 +73,6 @@ def nuclear_contracted(alphas,coefa,xyza,la,betas,coefb,xyzb,lb,atoms,charge,num
 
 
 def nuclear_primitive(alpha,coefa,A,la,beta,coefb,B,lb,C,charge,numatoms):
-    ''' This version just work with s and p orbitals '''
     gamma = alpha+beta
     gammainv = 1.0/gamma
     ab = -1.0*euclidean_norm2(np.subtract(A,B))
@@ -148,7 +145,6 @@ def kineticmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype):
     return T
 
 def kinetic_contracted(alphas,coefa,xyza,la,betas,coefb,xyzb,lb):
-    '''This version '''
     t = 0.0
     for i in range(len(alphas)):
         for j in range(len(betas)):
@@ -157,7 +153,6 @@ def kinetic_contracted(alphas,coefa,xyza,la,betas,coefb,xyzb,lb):
     return t
 
 def kinetic_primitive(alpha,coefa,A,la,beta,coefb,B,lb):
-    ''' This version just work with s and p orbitals '''
     gamma = 1.0/(alpha+beta)
     eta = alpha*beta*gamma
     ab = -1.0*euclidean_norm2(np.subtract(A,B))

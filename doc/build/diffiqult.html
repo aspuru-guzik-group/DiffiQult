@@ -1,0 +1,526 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Code Documentation &mdash; DiffiQulT 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="DiffiQulT 0.1 documentation" href="index.html"/>
+        <link rel="prev" title="DiffiQult" href="intro.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> DiffiQulT
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">DiffiQult</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#getting-started-with-diffiqult">Getting started with DiffiQult</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="intro.html#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="intro.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-diffiqult.Task">diffiqult.Task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-diffiqult.Molecule">diffiqult.Molecule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-diffiqult.Energy">diffiqult.Energy</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DiffiQulT</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Code Documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/diffiqult.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="code-documentation">
+<span id="codedoc"></span><h1>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-diffiqult.Task">
+<span id="diffiqult-task"></span><h2>diffiqult.Task<a class="headerlink" href="#module-diffiqult.Task" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="diffiqult.Task.Tasks">
+<em class="property">class </em><code class="descclassname">diffiqult.Task.</code><code class="descname">Tasks</code><span class="sig-paren">(</span><em>mol</em>, <em>name</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class manage the implemented tasks over a system included
+in DiffiQult</p>
+<dl class="docutils">
+<dt>sys <span class="classifier-delimiter">:</span> <span class="classifier">System_mol object</span></dt>
+<dd>Contains the basis functions, geometry and information of the a molecular system.</dd>
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>An id of the task, it is used as prefix for outputs</dd>
+<dt>verbose: bool</dt>
+<dd>It defines the output and screen options
+True it prints in screen all details and a file “name.out”</dd>
+<dt>status: bool</dt>
+<dd>Keep track of the success of the different task.
+True the SCF and/or the optimization converged</dd>
+</dl>
+<dl class="method">
+<dt id="diffiqult.Task.Tasks.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mol</em>, <em>name</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize molecular metadata which defines class.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>mol <span class="classifier-delimiter">:</span> <span class="classifier">System_mol object</span></dt>
+<dd>Contains the basis functions, geometry and information of the a molecular system.</dd>
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>An id of the task, it is used as prefix for outputs</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="docutils">
+<dt>verbose <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>It defines the output and screen options
+True it prints in screen all details and a file “name.out”</dd>
+<dt>status: bool</dt>
+<dd>Keep track of the success of the different task.
+True the SCF and/or the optimization converged</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="diffiqult.Task.Tasks.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><em>max_scf=30</em>, <em>max_d=300</em>, <em>printguess=None</em>, <em>output=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function handdles the single point calculations</p>
+<dl class="docutils">
+<dt>max_scf <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>maximum number of scf steps, default 30</dd>
+<dt>printguess <span class="classifier-delimiter">:</span> <span class="classifier">str </span></dt>
+<dd>file path if it is requiered to prepare an inital guess for the molecular orbital coefficients</dd>
+<dt>output <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>True if it will print a molden file in case of success</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="diffiqult.Task.Tasks.optimization">
+<code class="descname">optimization</code><span class="sig-paren">(</span><em>max_scf=100, log=True, scf=True, name='Output', readguess=None, output=False, argnum=[0], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.optimization" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function handdles the optimization procedure 
+Parameters
+__________
+argnum : list of integers</p>
+<blockquote>
+<div>Parameter to optimize
+0 widths
+1 contraction coefficients
+2 Gaussian centers
+e.g. [0,1] to optimized widhts and contraction coefficients</div></blockquote>
+<dl class="docutils">
+<dt>max_scf <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>maximum number of scf steps, default 30</dd>
+<dt>log <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>If we are not optimizing the log of exponent, we highly recoment leave it as True, the default.</dd>
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Output file name default Output</dd>
+<dt>readguess <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>File path to a npy file in case on predefined initial guess of the density matrix</dd>
+<dt>output <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>True if it will print a molden file in case of success</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="diffiqult.Task.Tasks.runtask">
+<code class="descname">runtask</code><span class="sig-paren">(</span><em>task</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.runtask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.runtask" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>This method run a given task and if it has success, it uptates system with the most recent</div></blockquote>
+<p>energy value and basis function</p>
+<dl class="docutils">
+<dt>task <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><blockquote class="first">
+<div>If defines the task:</div></blockquote>
+<p class="last">‘Energy’ is a single point calculation     
+‘Opt’ an optimization of a given parameter</p>
+</dd>
+</dl>
+<dl class="docutils">
+<dt>success <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>True if task ended successfully</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-diffiqult.Molecule">
+<span id="diffiqult-molecule"></span><h2>diffiqult.Molecule<a class="headerlink" href="#module-diffiqult.Molecule" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="diffiqult.Molecule.Getbasis">
+<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">Getbasis</code><span class="sig-paren">(</span><em>molecule</em>, <em>basis</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#Getbasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getbasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class loads the basis function for a given molecule
+Attributes
+__________
+alpha : array</p>
+<blockquote>
+<div>Gaussian withds</div></blockquote>
+<dl class="docutils">
+<dt>coef <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Contraction coefficients</dd>
+<dt>xyz <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Gaussian centers</dd>
+<dt>list_contr <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>List of integers with contractions, 
+eg. [3,3] are two AO with three primitives each</dd>
+<dt>l <span class="classifier-delimiter">:</span> <span class="classifier">list of tuples </span></dt>
+<dd>List of tuple of integers with angular momentums
+eg. [(0,0,0),(0,1,0)] one s orbital and one p_x</dd>
+</dl>
+<dl class="method">
+<dt id="diffiqult.Molecule.Getbasis.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>molecule</em>, <em>basis</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#Getbasis.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getbasis.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>molecule <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><blockquote class="first">
+<div><p>It contains spects of geometry
+[( atomic_number_atom_1,(x,y,z),</p>
+<blockquote>
+<div>atomic_number_atom_1,(x,y,z),
+atomic_number_atom_1,(x,y,z)]</div></blockquote>
+</div></blockquote>
+<p>eg. water
+.. code-block:: python</p>
+<blockquote class="last">
+<div>(8,(0.0, 0.0, 0.091685801102911746)),
+(1,(1.4229678834888837, 0.0, -0.98120954931681137)),
+(1,(-1.4229678834888837, 0.0, -0.98120954931681137))]</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="diffiqult.Molecule.Getgeom">
+<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">Getgeom</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#Getgeom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getgeom" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class loads the moleculegeom</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="diffiqult.Molecule.System_mol">
+<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">System_mol</code><span class="sig-paren">(</span><em>mol</em>, <em>basis_set</em>, <em>ne</em>, <em>mol_name='molecule'</em>, <em>angs=False</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#System_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class contains all the information of the system
+extracted from mol and basis</p>
+<dl class="docutils">
+<dt>alpha <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Gaussian withds</dd>
+<dt>coef <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Contraction coefficients</dd>
+<dt>xyz <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Gaussian centers</dd>
+<dt>list_contr <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>List of integers with contractions, 
+eg. [3,3] are two AO with three primitives each</dd>
+<dt>l <span class="classifier-delimiter">:</span> <span class="classifier">list of tuples </span></dt>
+<dd>List of tuple of integers with angular momentums
+eg. [(0,0,0),(0,1,0)] one s orbital and one p_x</dd>
+</dl>
+<dl class="method">
+<dt id="diffiqult.Molecule.System_mol.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mol</em>, <em>basis_set</em>, <em>ne</em>, <em>mol_name='molecule'</em>, <em>angs=False</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#System_mol.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function starts an object System_mol</p>
+<dl class="docutils">
+<dt>mol <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><dl class="first last docutils">
+<dt>It contains spects of geometry</dt>
+<dd><dl class="first last docutils">
+<dt>[( atomic_number_atom_1,(x,y,z), </dt>
+<dd>atomic_number_atom_1,(x,y,z),
+atomic_number_atom_1,(x,y,z)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>basis: dict</dt>
+<dd><dl class="first last docutils">
+<dt>{atomic_number: [(‘type’,[(exp,coef),</dt>
+<dd><blockquote class="first">
+<div><blockquote>
+<div>(exp,coef)]),</div></blockquote>
+<dl class="docutils">
+<dt>(‘type’,[(exp,coef),</dt>
+<dd>(exp,coef)])],</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>atomic_number: [(‘type’,[(exp,coef),</dt>
+<dd><blockquote class="first">
+<div>(exp,coef)]),</div></blockquote>
+<dl class="last docutils">
+<dt>(‘type’,[(exp,coef),</dt>
+<dd>(exp,coef)])]}</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>ne <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>Number of electron</dd>
+<dt>mol_name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>An id</dd>
+</dl>
+<p>shifted  : bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="diffiqult.Molecule.System_mol.printcurrentgeombasis">
+<code class="descname">printcurrentgeombasis</code><span class="sig-paren">(</span><em>tape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#System_mol.printcurrentgeombasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol.printcurrentgeombasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method prints the current values of sys on tape</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-diffiqult.Energy">
+<span id="diffiqult-energy"></span><h2>diffiqult.Energy<a class="headerlink" href="#module-diffiqult.Energy" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="diffiqult.Energy.rhfenergy">
+<code class="descclassname">diffiqult.Energy.</code><code class="descname">rhfenergy</code><span class="sig-paren">(</span><em>alpha_old</em>, <em>coef2</em>, <em>xyz</em>, <em>l</em>, <em>charges</em>, <em>xyz_atom</em>, <em>natoms</em>, <em>nbasis</em>, <em>contr_list</em>, <em>ne</em>, <em>max_scf</em>, <em>max_d</em>, <em>log</em>, <em>eigen</em>, <em>printguess</em>, <em>readguess</em>, <em>name</em>, <em>write</em>, <em>dtype</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Energy.html#rhfenergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Energy.rhfenergy" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the rhf function
+Parameters
+————
+alpha_old : array</p>
+<blockquote>
+<div>Gaussian exponents</div></blockquote>
+<dl class="docutils">
+<dt>coef2 <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Contraction coeffients</dd>
+<dt>xyz <span class="classifier-delimiter">:</span> <span class="classifier">array 3N</span></dt>
+<dd>Gaussian centers</dd>
+<dt>l <span class="classifier-delimiter">:</span> <span class="classifier">array 3N</span></dt>
+<dd>Angular momentum each entry is a vector
+eg. s orbital (0,0,0) or pz (1,0,0)</dd>
+<dt>charges <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Atom charges</dd>
+<dt>nbasis <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>Number of basis</dd>
+<dt>contr_list: list of integers</dt>
+<dd>Specify the number of orbitals in each atom</dd>
+<dt>ne <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>Number of electrons</dd>
+<dt>max_scf <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>maximum number of scf cycles</dd>
+<dt>log <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>The exponents are given in log</dd>
+<dt>printguess: str or None</dt>
+<dd>File to print coeff matrix initial guess</dd>
+<dt>readguess <span class="classifier-delimiter">:</span> <span class="classifier">str or None</span></dt>
+<dd>File that contains coeff matrix initial guess</dd>
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Output file name</dd>
+<dt>write <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>True if printing</dd>
+<dt>dtype <span class="classifier-delimiter">:</span> <span class="classifier">type of output</span></dt>
+<dd>This is the directive to know if algopy will be used or not
+np.float64(1.0) if it is a single point calculation
+otherwise, it specify the size of the UTMP, autodifferentiation</dd>
+</dl>
+<dl class="docutils">
+<dt>energy <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>RHF energy</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="intro.html" class="btn btn-neutral" title="DiffiQult" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, ttamayo.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
