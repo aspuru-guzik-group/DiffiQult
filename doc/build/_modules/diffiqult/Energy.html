@@ -1,0 +1,572 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>diffiqult.Energy &mdash; DiffiQulT 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="DiffiQulT 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> DiffiQulT
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">DiffiQult</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html#getting-started-with-diffiqult">Getting started with DiffiQult</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../diffiqult.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Task">diffiqult.Task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Molecule">diffiqult.Molecule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Energy">diffiqult.Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#diffiqult-optimize">diffiqult.Optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../todo.html">Current features</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DiffiQulT</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>diffiqult.Energy</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for diffiqult.Energy</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">Integrals</span>
+<span class="kn">from</span> <span class="nn">Integrals</span> <span class="k">import</span> <span class="n">erivector</span><span class="p">,</span><span class="n">overlapmatrix</span><span class="p">,</span><span class="n">nuclearmatrix</span><span class="p">,</span><span class="n">kineticmatrix</span><span class="p">,</span><span class="n">normalization</span>
+<span class="kn">import</span> <span class="nn">Tools</span>
+<span class="kn">from</span> <span class="nn">Tools</span> <span class="k">import</span> <span class="n">euclidean_norm</span><span class="p">,</span><span class="n">printmatrix</span><span class="p">,</span><span class="n">eri_index</span>
+<span class="kn">import</span> <span class="nn">algopy</span>
+<span class="kn">from</span> <span class="nn">algopy</span> <span class="k">import</span> <span class="n">UTPM</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span><span class="n">transpose</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">Eigen</span> 
+<span class="kn">from</span> <span class="nn">Eigen</span> <span class="k">import</span> <span class="n">eigensolver</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This module contains functions to obtain energy</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">mo_naturalorbital</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="n">eigsys</span> <span class="o">=</span> <span class="n">eigensolver</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">eigsys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> 
+    
+
+<span class="k">def</span> <span class="nf">nuclearrepulsion</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">natoms</span><span class="p">):</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">xyza</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+       <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">natoms</span><span class="p">):</span>
+           <span class="n">xyzb</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+           <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">+</span> <span class="n">charges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">charges</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">/</span><span class="n">euclidean_norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">xyzb</span><span class="p">,</span><span class="n">xyza</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tmp</span>
+
+<span class="k">def</span> <span class="nf">fockmatrix</span><span class="p">(</span><span class="n">Hcore</span><span class="p">,</span><span class="n">Eri</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">dtype</span><span class="p">):</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbasis</span><span class="p">,</span><span class="n">nbasis</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+       <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">nbasis</span><span class="p">):</span>
+           <span class="n">tmp</span> <span class="o">=</span> <span class="n">Hcore</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+           <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+               <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">l</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">Eri</span><span class="p">[</span><span class="n">eri_index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">)]</span><span class="o">-</span><span class="n">Eri</span><span class="p">[</span><span class="n">eri_index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">)])</span><span class="o">+</span> <span class="n">tmp</span>
+           <span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+    <span class="k">return</span> <span class="n">F</span>
+
+
+<span class="k">def</span> <span class="nf">cannonicalputication</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">S</span><span class="p">):</span>
+    <span class="n">D2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">S</span><span class="p">),</span><span class="n">D</span><span class="p">)</span>
+    <span class="n">D3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D2</span><span class="p">,</span><span class="n">S</span><span class="p">),</span><span class="n">D</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">D2</span><span class="p">,</span><span class="n">D3</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">D2</span><span class="p">))</span> <span class="c1">## Eq 17 Manolopoulos</span>
+    
+    <span class="k">if</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">((</span><span class="mf">1.0</span><span class="o">-</span><span class="mf">2.0</span><span class="o">*</span><span class="n">c</span><span class="p">),</span><span class="n">D</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">((</span><span class="mf">1.0</span><span class="o">+</span><span class="n">c</span><span class="p">),</span><span class="n">D2</span><span class="p">)),</span><span class="n">D3</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">((</span><span class="mf">1.0</span><span class="o">+</span><span class="n">c</span><span class="p">),</span><span class="n">D2</span><span class="p">),</span><span class="n">D3</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">S</span><span class="p">)))</span> <span class="c1">## I am not dividing by one here!!</span>
+    
+<span class="k">def</span> <span class="nf">newdensity</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">Sinv</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">ne</span><span class="p">):</span>
+    <span class="n">F_offdiag</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+        <span class="n">F_offdiag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+       <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+           <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+              <span class="n">F_offdiag</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span> <span class="o">+</span> <span class="n">F_offdiag</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">listFmin</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">listFmax</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+        <span class="n">listFmin</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">F_offdiag</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">listFmax</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">F_offdiag</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    
+    <span class="n">Fmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">listFmax</span><span class="p">)</span>
+    <span class="n">Fmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">listFmin</span><span class="p">)</span>
+
+    <span class="n">mubar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="o">/</span><span class="n">nbasis</span>
+    <span class="n">lamb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([(</span><span class="n">nbasis</span><span class="o">-</span><span class="n">ne</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">mubar</span><span class="o">-</span><span class="n">Fmin</span><span class="p">),</span><span class="n">ne</span><span class="o">/</span><span class="p">(</span><span class="n">Fmax</span><span class="o">-</span><span class="n">mubar</span><span class="p">)])</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">lamb</span><span class="o">/</span><span class="n">nbasis</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">mubar</span><span class="o">*</span><span class="n">Sinv</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Sinv</span><span class="p">,</span><span class="n">F</span><span class="p">),</span><span class="n">Sinv</span><span class="p">))),</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">ne</span><span class="o">/</span><span class="n">nbasis</span><span class="p">),</span><span class="n">Sinv</span><span class="p">))</span>
+
+<div class="viewcode-block" id="rhfenergy"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Energy.rhfenergy">[docs]</a><span class="k">def</span> <span class="nf">rhfenergy</span><span class="p">(</span><span class="n">alpha_old</span><span class="p">,</span><span class="n">coef2</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">xyz_atom</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">ne</span><span class="p">,</span><span class="n">max_scf</span><span class="p">,</span><span class="n">max_d</span><span class="p">,</span><span class="n">log</span><span class="p">,</span><span class="n">eigen</span><span class="p">,</span><span class="n">printguess</span><span class="p">,</span><span class="n">readguess</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">write</span><span class="p">,</span><span class="n">dtype</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function returns the rhf function</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">     alpha_old : array</span>
+<span class="sd">                Gaussian exponents</span>
+<span class="sd">     coef2     : array</span>
+<span class="sd">                Contraction coeffients</span>
+<span class="sd">     xyz       : array 3N</span>
+<span class="sd">                Gaussian centers</span>
+<span class="sd">     l         : array 3N</span>
+<span class="sd">                Angular momentum each entry is a vector</span>
+<span class="sd">                eg. s orbital (0,0,0) or pz (1,0,0)</span>
+<span class="sd">     charges   : array</span>
+<span class="sd">                Atom charges</span>
+<span class="sd">     nbasis    : int</span>
+<span class="sd">                Number of basis</span>
+<span class="sd">     contr_list: list of integers</span>
+<span class="sd">                Specify the number of orbitals in each atom</span>
+<span class="sd">     ne        : int</span>
+<span class="sd">                Number of electrons</span>
+<span class="sd">     max_scf   : int</span>
+<span class="sd">                maximum number of scf cycles</span>
+<span class="sd">     log       : bool</span>
+<span class="sd">                The exponents are given in log</span>
+<span class="sd">     printguess: str or None</span>
+<span class="sd">                File to print coeff matrix initial guess</span>
+<span class="sd">     readguess : str or None</span>
+<span class="sd">                File that contains coeff matrix initial guess</span>
+<span class="sd">     name      : str</span>
+<span class="sd">                Output file name</span>
+<span class="sd">     write     : bool</span>
+<span class="sd">                True if printing</span>
+<span class="sd">     dtype     : type of output</span>
+<span class="sd">                This is the directive to know if algopy will be used or not</span>
+<span class="sd">                np.float64(1.0) if it is a single point calculation</span>
+<span class="sd">                otherwise, it specify the size of the UTMP, autodifferentiation</span>
+<span class="sd">    Returns:</span>
+<span class="sd">       energy    : float</span>
+<span class="sd">                RHF energy</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tool_D</span> <span class="o">=</span> <span class="mf">1e-8</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="mf">1e-8</span>
+    
+    <span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+       <span class="n">alpha</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">alpha_old</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+    	<span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_old</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">xyz_atom</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="c1">## Cover the case of diff xyz atom</span>
+        <span class="n">coef</span> <span class="o">=</span> <span class="n">normalization</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef2</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">nuclearmatrix</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">xyz_atom</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">overlapmatrix</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">kineticmatrix</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">Eri</span> <span class="o">=</span> <span class="n">erivector</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">coef</span> <span class="o">=</span> <span class="n">normalization</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef2</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">overlapmatrix</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">nuclearmatrix</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">xyz_atom</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">kineticmatrix</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">Eri</span> <span class="o">=</span> <span class="n">erivector</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">Hcore</span> <span class="o">=</span> <span class="n">T</span> <span class="o">+</span> <span class="n">V</span>
+    <span class="k">if</span> <span class="n">eigen</span><span class="p">:</span>
+       <span class="n">eigsys</span> <span class="o">=</span> <span class="n">eigensolver</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+       <span class="n">SqrtLambda</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">algopy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eigsys</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+       <span class="n">L</span> <span class="o">=</span> <span class="n">eigsys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+       <span class="n">LT</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+       <span class="n">SqrtS</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">SqrtLambda</span><span class="p">),</span> <span class="n">LT</span><span class="p">)</span>
+       <span class="n">SqrtST</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">SqrtS</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="n">Sinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+ 
+    <span class="k">if</span> <span class="n">readguess</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+	<span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">readguess</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbasis</span><span class="p">,</span><span class="n">nbasis</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+           <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+              <span class="n">tmp</span> <span class="o">=</span> <span class="mf">0.0</span>
+              <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ne</span><span class="p">):</span>
+                   <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">+</span> <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+              <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">fockmatrix</span><span class="p">(</span><span class="n">Hcore</span><span class="p">,</span><span class="n">Eri</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+    	<span class="n">F</span> <span class="o">=</span> <span class="n">Hcore</span>
+    <span class="n">OldE</span> <span class="o">=</span> <span class="mf">1e8</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">E_step</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">scf_iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_scf</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">eigen</span><span class="p">:</span>
+           <span class="n">Fprime</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">SqrtST</span><span class="p">,</span><span class="n">F</span><span class="p">),</span> <span class="n">SqrtS</span><span class="p">)</span>
+           <span class="n">eigsysFockOp</span> <span class="o">=</span> <span class="n">eigensolver</span><span class="p">(</span><span class="n">Fprime</span><span class="p">)</span>
+           <span class="n">Cprime</span> <span class="o">=</span> <span class="n">eigsysFockOp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+           <span class="n">C</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">SqrtS</span><span class="p">,</span> <span class="n">Cprime</span><span class="p">)</span>
+           <span class="n">Fprime</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">SqrtST</span><span class="p">,</span><span class="n">F</span><span class="p">),</span> <span class="n">SqrtS</span><span class="p">)</span>
+           <span class="n">eigsysFockOp</span> <span class="o">=</span> <span class="n">eigensolver</span><span class="p">(</span><span class="n">Fprime</span><span class="p">)</span>
+           <span class="n">Cprime</span> <span class="o">=</span> <span class="n">eigsysFockOp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+           <span class="n">C</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">SqrtS</span><span class="p">,</span> <span class="n">Cprime</span><span class="p">)</span>
+           <span class="n">D</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbasis</span><span class="p">,</span><span class="n">nbasis</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+              <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+                 <span class="n">tmp</span> <span class="o">=</span> <span class="mf">0.0</span>
+                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ne</span><span class="p">):</span>
+                      <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">+</span> <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                 <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="n">D</span> <span class="o">=</span> <span class="n">newdensity</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">Sinv</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">ne</span><span class="p">)</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_d</span><span class="p">):</span>
+              <span class="n">D</span> <span class="o">=</span> <span class="n">cannonicalputication</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">S</span><span class="p">)</span>
+              <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">D</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">S</span><span class="p">),</span><span class="n">D</span><span class="p">))</span>
+              <span class="k">if</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="n">tool_D</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">fockmatrix</span><span class="p">(</span><span class="n">Hcore</span><span class="p">,</span><span class="n">Eri</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">E_elec</span> <span class="o">=</span> <span class="n">algopy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">Hcore</span><span class="o">+</span><span class="n">F</span><span class="p">))</span>
+        <span class="n">E_step</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">E_elec</span><span class="p">)</span>
+        <span class="n">E_nuc</span> <span class="o">=</span> <span class="n">nuclearrepulsion</span><span class="p">(</span><span class="n">xyz_atom</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">natoms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">E_elec</span> <span class="o">-</span> <span class="n">OldE</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tool</span><span class="p">:</span>
+           <span class="n">status</span> <span class="o">=</span> <span class="kc">True</span> 
+           <span class="k">break</span>
+        <span class="n">OldE</span> <span class="o">=</span> <span class="n">E_elec</span>
+    <span class="n">E_nuc</span> <span class="o">=</span> <span class="n">nuclearrepulsion</span><span class="p">(</span><span class="n">xyz_atom</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">natoms</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">printguess</span> <span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">printguess</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_system</span><span class="p">():</span>
+       <span class="n">mol</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">E_elec</span> <span class="o">+</span> <span class="n">E_nuc</span>
+       <span class="n">mol</span><span class="o">.</span><span class="n">erepulsion</span> <span class="o">=</span> <span class="n">Eri</span>
+       <span class="n">mol</span><span class="o">.</span><span class="n">hcore</span> <span class="o">=</span> <span class="n">Hcore</span>
+       <span class="n">mol</span><span class="o">.</span><span class="n">mo_coeff</span> <span class="o">=</span> <span class="n">C</span>
+       <span class="k">return</span> 
+            
+
+    <span class="k">def</span> <span class="nf">write_molden</span><span class="p">():</span>
+       <span class="kn">import</span> <span class="nn">Data</span>
+       <span class="kn">from</span> <span class="nn">Data</span> <span class="k">import</span> <span class="n">select_atom</span>
+       <span class="c1">## Details of calculation</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[Energy] </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;E_elec: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">E_elec</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;E_nuc: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">E_nuc</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;E_tot: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">E_nuc</span><span class="o">+</span><span class="n">E_elec</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SCF Details</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;Eigen: &#39;</span>
+       <span class="k">if</span> <span class="n">eigen</span><span class="p">:</span> 
+           <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">+</span><span class="s1">&#39;True&#39;</span><span class="p">)</span>
+       <span class="k">else</span><span class="p">:</span>
+           <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">+</span><span class="s1">&#39;False&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">E_step</span><span class="p">):</span>
+           <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;Step: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+           <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+       <span class="c1">### C Matrix</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[CM] </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C AO times MO</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">printmatrix</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">tape</span><span class="p">)</span>
+
+       <span class="c1">### D Matrix</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[DM] </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;D </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">printmatrix</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">tape</span><span class="p">)</span>
+
+       <span class="c1">### D Matrix</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[NMO] </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;NMO </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">printmatrix</span><span class="p">(</span><span class="n">mo_naturalorbital</span><span class="p">(</span><span class="n">D</span><span class="p">),</span><span class="n">tape</span><span class="p">)</span>
+
+       <span class="c1">### MO energies</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[MOE] </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;MOE </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">energ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eigsysFockOp</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+          <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">energ</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+       <span class="c1">### MO energies</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[INPUT] </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;mol = [&#39;</span>
+       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xyz_atom</span><span class="p">):</span>
+           <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;(&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">charges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
+           <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39;(&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;)),</span><span class="se">\n</span><span class="s1">&#39;</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+       <span class="n">cont</span> <span class="o">=</span> <span class="mi">0</span>
+       <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;basis = [&#39;</span>
+       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">ci</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contr_list</span><span class="p">):</span>
+           <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39;[&#39;</span>
+           <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;(&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;),&#39;</span>
+           <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ci</span><span class="p">):</span>
+               <span class="n">line</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="n">cont</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+               <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39;,(&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">xyz</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">xyz</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">xyz</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;)],</span><span class="se">\n</span><span class="s1">&#39;</span>
+               <span class="n">cont</span> <span class="o">+=</span><span class="mi">1</span>
+           <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39;]</span><span class="se">\n</span><span class="s1">&#39;</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+           
+       <span class="c1">### Atom coordinates</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[Atoms]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xyz_atom</span><span class="p">):</span>
+           <span class="n">line</span> <span class="o">=</span> <span class="n">select_atom</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">charges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+           <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">charges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+           <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39; &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+           <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+       <span class="c1">### Basis coordinates</span>
+       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xyz</span><span class="p">):</span>
+           <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;XX&#39;</span>
+           <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">natoms</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+           <span class="n">line</span> <span class="o">+=</span><span class="s1">&#39; &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">coord</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+           <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+       <span class="c1">### Basis set</span>
+       <span class="n">cont</span> <span class="o">=</span> <span class="mi">0</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[GTO]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">ci</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contr_list</span><span class="p">):</span>
+          <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">natoms</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;  0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; s   &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; 1.0 &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="k">else</span><span class="p">:</span>
+             <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; p   &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; 1.0 &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+             <span class="c1">#tape.write(&#39; p   &#39;+str(1)+&#39; 1.0 &#39;+ str(l[i])+&#39;\n&#39;)</span>
+          <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ci</span><span class="p">):</span>
+              <span class="n">line</span> <span class="o">=</span><span class="s1">&#39;  &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="n">cont</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="n">cont</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+              <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+              <span class="n">cont</span> <span class="o">+=</span><span class="mi">1</span>
+          <span class="n">line</span> <span class="o">=</span><span class="s1">&#39;  </span><span class="se">\n</span><span class="s1">&#39;</span>
+          <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+       <span class="c1">### MOs</span>
+       <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[MO]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+          <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Sym=  None</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Ene=      &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">eigsysFockOp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Spin= Alpha</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">ne</span><span class="p">:</span>
+             <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Occup=    0.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="k">else</span><span class="p">:</span>
+             <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Occup=    2.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+              <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">natoms</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="n">status</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">write</span><span class="p">:</span>
+         <span class="n">tape</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.molden&#39;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+         <span class="n">write_molden</span><span class="p">()</span>
+         <span class="n">tape</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+         <span class="k">return</span> <span class="n">E_elec</span><span class="o">+</span><span class="n">E_nuc</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_elec: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">E_elec</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_nuc: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">E_nuc</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_tot: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">E_nuc</span><span class="o">+</span><span class="n">E_elec</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SCF DID NOT CONVERGED&#39;</span><span class="p">)</span>
+       <span class="k">return</span> <span class="mi">99999</span>
+     
+    <span class="k">return</span> <span class="n">E_elec</span><span class="o">+</span><span class="n">E_nuc</span></div>
+
+<span class="k">def</span> <span class="nf">penalty_inverse</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef3</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">x_atom</span><span class="p">,</span><span class="n">y_atom</span><span class="p">,</span><span class="n">z_atom</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">ne</span><span class="p">,</span><span class="n">max_scf</span><span class="p">,</span><span class="n">max_d</span><span class="p">,</span><span class="n">lbda</span><span class="p">,</span><span class="n">eigen</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">write</span><span class="p">):</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">rhfenergy</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef3</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">x_atom</span><span class="p">,</span><span class="n">y_atom</span><span class="p">,</span><span class="n">z_atom</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">ne</span><span class="p">,</span><span class="n">max_scf</span><span class="p">,</span><span class="n">max_d</span><span class="p">,</span><span class="n">eigen</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">write</span><span class="p">)</span>
+
+    <span class="c1">## Rebuild xyz for basis</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,(</span><span class="mi">1</span><span class="p">,</span><span class="n">nbasis</span><span class="p">))</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y</span><span class="p">,(</span><span class="mi">1</span><span class="p">,</span><span class="n">nbasis</span><span class="p">))</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">z</span><span class="p">,(</span><span class="mi">1</span><span class="p">,</span><span class="n">nbasis</span><span class="p">))</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span><span class="n">z</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">coef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nbasis</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">coef</span> <span class="o">=</span> <span class="n">normalization</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">overlapmatrix2</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">coef</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">nbasis</span><span class="p">)</span>
+    <span class="n">penalty</span> <span class="o">=</span> <span class="n">lbda</span><span class="o">*</span><span class="mf">1.0e-3</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">energy</span> <span class="o">+</span> <span class="n">penalty</span>
+
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, ttamayo.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

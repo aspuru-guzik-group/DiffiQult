@@ -66,6 +66,6 @@ from numpy.testing import Tester
 test = Tester().test
 
 # import standard submodules and important classes/functions
-from Task import Tasks,Gradients
+from Task import Tasks
 from Molecule import System_mol
 

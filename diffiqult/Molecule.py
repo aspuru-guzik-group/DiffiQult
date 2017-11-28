@@ -4,9 +4,46 @@ from Data import select_atom
 
 class Getbasis:
     '''
-    This class loads the basis
+    This class loads the basis function for a given molecule
+    Attributes:
+     alpha : array
+           Gaussian withds
+     coef : array
+          Contraction coefficients
+     xyz : array
+          Gaussian centers
+     list_contr : list
+          List of integers with contractions, 
+          eg. [3,3] are two AO with three primitives each
+     l      : list of tuples 
+           List of tuple of integers with angular momentums
+           eg. [(0,0,0),(0,1,0)] one s orbital and one p_x
     '''
     def __init__(self,molecule,basis,shifted=False):
+       '''
+       
+       Parameters:
+         molecule : list
+                 It contains spects of geometry
+                 [( atomic_number_atom_1,(x,y,z), 
+                    atomic_number_atom_1,(x,y,z),
+                    atomic_number_atom_1,(x,y,z)]
+                eg. water
+
+                    ``` (8,(0.0, 0.0, 0.091685801102911746)),
+                     (1,(1.4229678834888837, 0.0, -0.98120954931681137)),
+                     (1,(-1.4229678834888837, 0.0, -0.98120954931681137))]``
+         basis : dict
+                {atomic_number: [('type',[(exp,coef),
+                                          (exp,coef)]),
+                                 ('type',[(exp,coef),
+                                          (exp,coef)])],
+                 atomic_number: [('type',[(exp,coef),
+                                          (exp,coef)]),
+                                 ('type',[(exp,coef),
+                                          (exp,coef)])]}
+
+       '''
        # It is just a class for know, just in case we want to do more pre-procesing
        self.alpha = [] # exponents
        self.coef = []  # coef
@@ -15,14 +52,15 @@ class Getbasis:
        self.list_contr = []
        self.tot_prim = 0
        if shifted:
-          self.get_shiftedbasis(basis)
+          self._get_shiftedbasis(basis)
        else:
-          self.get_centeredbasis(molecule,basis)
+          self._get_centeredbasis(molecule,basis)
     
-    def get_centeredbasis(self,molecule,basis):
+    def _get_centeredbasis(self,molecule,basis):
+       
        for atom in molecule:
           for contr in basis[atom[0]]:
-              for l in self.getl_xyz(contr[0]): 
+              for l in self._getl_xyz(contr[0]): 
                   self.list_contr.append(len(contr[1]))
                   self.xyz.append([atom[1][0],atom[1][1],atom[1][2]])
                   self.l.append(l)
@@ -31,7 +69,7 @@ class Getbasis:
                       self.coef.append(prim[1])
                       self.tot_prim += len(self.l[len(self.l)-1])
 
-    def get_shiftedbasis(self,basis):
+    def _get_shiftedbasis(self,basis):
        for gauss in basis:
            self.alpha.append(gauss[1])
            self.coef.append(gauss[2])
@@ -39,7 +77,7 @@ class Getbasis:
            self.xyz.append(gauss[3])
        return
 
-    def getl_xyz(self,l):
+    def _getl_xyz(self,l):
        angular = {'S':[(0,0,0)],
                   'P':[(1,0,0),(0,1,0),(0,0,1)]}
        return angular[l]
@@ -47,7 +85,13 @@ class Getbasis:
 
 class Getgeom:
     '''
-    This class loads the moleculegeom
+    This class loads the geometry in xyz coordinates
+       Parameters:
+         molecule : list
+                 It contains spects of geometry
+                 [( atomic_number_atom_1,(x,y,z), 
+                    atomic_number_atom_1,(x,y,z),
+                    atomic_number_atom_1,(x,y,z)]
     '''
     def __init__(self,molecule):
        self.xyz = []   # coordinates of atoms
@@ -59,40 +103,94 @@ class Getgeom:
 
 
 class System_mol():
-    '''This class contains all the information of the system
-    extracted from mol and basis'''
+    '''
+    This class contains all the information of the system
+    extracted from mol and basis
+
+    Parameters:
+
+     alpha : array
+           Gaussian withds
+     coef : array
+          Contraction coefficients
+     xyz : array
+          Gaussian centers
+     list_contr : list
+          List of integers with contractions, 
+          eg. [3,3] are two AO with three primitives each
+     l      : list of tuples 
+           List of tuple of integers with angular momentums
+           eg. [(0,0,0),(0,1,0)] one s orbital and one p_x
+    '''
 
     def __init__(self,mol,basis_set,ne,mol_name='molecule',angs=False,shifted=False):
+         '''
+         This function starts an object System_mol
 
-          self.mol_name = mol_name
-          ## Info for basis
-          Basis = Getbasis(mol,basis_set,shifted=shifted)                        # Get basis
-          self.list_contr = Basis.list_contr
-          self.nbasis = len(Basis.list_contr)
-          self.alpha = np.array(Basis.alpha)                                    # Alpha
-          self.xyz = np.reshape(np.array(Basis.xyz,dtype='float64'),(self.nbasis,3)) # Nuclear coordinates
-          self.l = Basis.l
+         Parameters:
+           mol : list
+                It contains spects of geometry
+                 [( atomic_number_atom_1,(x,y,z), 
+                    atomic_number_atom_1,(x,y,z),
+                    atomic_number_atom_1,(x,y,z)]
+    
+           basis: dict
+                {atomic_number: [('type',[(exp,coef),
+                                          (exp,coef)]),
+                                 ('type',[(exp,coef),
+                                          (exp,coef)])],
+                 atomic_number: [('type',[(exp,coef),
+                                          (exp,coef)]),
+                                 ('type',[(exp,coef),
+                                          (exp,coef)])]}
+           ne       : int
+                Number of electron
+           mol_name : str
+                An id
+           shifted  : bool
+                False in case standard basis functions
 
-          ## Geometry
-          Geom = Getgeom(mol)                           # Get basis
-          self.charges = np.array(Geom.charge)               # Charges
-          self.atom = np.array(Geom.xyz)                     # Alpha
-          self.natoms = len(self.charges)
+                True in case costumized basis functions
+           angs : bool
+                False is atomic units 
+ 
+                True if lenght units are angstroms 
+                   
+         '''
+
+         self.mol_name = mol_name
+         ## Info for basis
+         Basis = Getbasis(mol,basis_set,shifted=shifted)                        # Get basis
+         self.list_contr = Basis.list_contr
+         self.nbasis = len(Basis.list_contr)
+         self.alpha = np.array(Basis.alpha)                                    # Alpha
+         self.xyz = np.reshape(np.array(Basis.xyz,dtype='float64'),(self.nbasis,3)) # Nuclear coordinates
+         self.l = Basis.l
+
+         ## Geometry
+         Geom = Getgeom(mol)                           # Get basis
+         self.charges = np.array(Geom.charge)               # Charges
+         self.atom = np.array(Geom.xyz)                     # Alpha
+         self.natoms = len(self.charges)
    
-          ## Normalization
-          self.coef = np.array(Basis.coef)
+         ## Normalization
+         self.coef = np.array(Basis.coef)
   
-          ## Number of electrons
-          self.ne = int(ne/2)
-          if angs:
-             factor = 0.529177249
-             self.xyz = factor*self.xyz
-             self.atom = factor*self.atom
-          print(self.ne)
-          return
+         ## Number of electrons
+         self.ne = int(ne/2)
+         if angs:
+            factor = 0.529177249
+            self.xyz = factor*self.xyz
+            self.atom = factor*self.atom
+         return
 
     def printcurrentgeombasis(self,tape):
-       '''This method prints the current values of sys on tape'''
+       ''' 
+       This method prints the current values of sys on tape
+       Parameters:
+           tape : file obj
+                Output file
+       '''
        ### Atom coordinates
        tape.write(' Atomic coordinates\n')
        for i,coord in enumerate(self.atom):

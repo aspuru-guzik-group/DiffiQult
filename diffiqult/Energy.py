@@ -15,8 +15,6 @@ This module contains functions to obtain energy
 
 def mo_naturalorbital(D):
     eigsys = eigensolver(D)
-    print eigsys[0]
-    print eigsys[1]
     return [eigsys[0]] 
     
 
@@ -76,15 +74,45 @@ def newdensity(F,Sinv,nbasis,ne):
 
 def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne,max_scf,max_d,log,eigen,printguess,readguess,name,write,dtype):
     '''
-    Here will be the rhf function
-    eigen = False -> Canonical Purification
-    tape = name -> Tape for recording
-    record = bool -> Are we recording?
-    readguess -> are we reading a guess?, name of the file
-    printguess -> are we creating a guess?, name of the file
-    name -> Name of record (it must be -3)
-    write -> Record output.molden (it must be -2)
-    dtype -> type of var to differentiate for Algopy empty matrices
+    This function returns the rhf function
+
+    Parameters:
+     alpha_old : array
+                Gaussian exponents
+     coef2     : array
+                Contraction coeffients
+     xyz       : array 3N
+                Gaussian centers
+     l         : array 3N
+                Angular momentum each entry is a vector
+                eg. s orbital (0,0,0) or pz (1,0,0)
+     charges   : array
+                Atom charges
+     nbasis    : int
+                Number of basis
+     contr_list: list of integers
+                Specify the number of orbitals in each atom
+     ne        : int
+                Number of electrons
+     max_scf   : int
+                maximum number of scf cycles
+     log       : bool
+                The exponents are given in log
+     printguess: str or None
+                File to print coeff matrix initial guess
+     readguess : str or None
+                File that contains coeff matrix initial guess
+     name      : str
+                Output file name
+     write     : bool
+                True if printing
+     dtype     : type of output
+                This is the directive to know if algopy will be used or not
+                np.float64(1.0) if it is a single point calculation
+                otherwise, it specify the size of the UTMP, autodifferentiation
+    Returns:
+       energy    : float
+                RHF energy
     '''
     tool_D = 1e-8
     tool = 1e-8
@@ -94,20 +122,16 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
     else:
     	alpha = alpha_old
 
-    if type(alpha) != np.ndarray: ## Cover the case of diff xyz atom
-        coef = normalization(alpha,coef2,l,contr_list,dtype=dtype)
-    else:
-        coef = normalization(alpha,coef2,l,contr_list,dtype=np.float64(1.0))
-    
-    V = nuclearmatrix(alpha,coef,xyz,l,nbasis,charges,xyz_atom,natoms,contr_list,dtype=dtype)
     if type(xyz_atom) != np.ndarray: ## Cover the case of diff xyz atom
-        dtypef = np.float64(1.0)
-        S = overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtypef)
-        T = kineticmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtypef)
-        Eri = erivector(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtypef)
-   
+        coef = normalization(alpha,coef2,l,contr_list,dtype= np.float64(1.0))
+        V = nuclearmatrix(alpha,coef,xyz,l,nbasis,charges,xyz_atom,natoms,contr_list,dtype=dtype)
+        S = overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=np.float64(1.0))
+        T = kineticmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=np.float64(1.0))
+        Eri = erivector(alpha,coef,xyz,l,nbasis,contr_list,dtype=np.float(1.0))
     else:
+        coef = normalization(alpha,coef2,l,contr_list,dtype=dtype)
         S = overlapmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtype)
+        V = nuclearmatrix(alpha,coef,xyz,l,nbasis,charges,xyz_atom,natoms,contr_list,dtype=dtype)
         T = kineticmatrix(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtype)
         Eri = erivector(alpha,coef,xyz,l,nbasis,contr_list,dtype=dtype)
     Hcore = T + V
@@ -122,7 +146,6 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
        Sinv = np.linalg.inv(S)
  
     if readguess != None:
-        #print 'Reading previous guess'+readguess
 	C = np.load(readguess)
         D = np.zeros((nbasis,nbasis))
         for i in range(nbasis):
@@ -261,7 +284,7 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
        for i,ci in enumerate(contr_list):
           tape.write('  '+str(i+1+natoms)+'  0\n')
           if np.sum(l[i]) == 0 :
-             tape.write(' s   '+str(ci)+' 1.0 '+ str(l[i][0])+' '+str(l[i][1])+' '+str(l[i][2])+'\n')
+            tape.write(' s   '+str(ci)+' 1.0 '+ str(l[i][0])+' '+str(l[i][1])+' '+str(l[i][2])+'\n')
           else:
              tape.write(' p   '+str(ci)+' 1.0 '+ str(l[i][0])+' '+str(l[i][1])+' '+str(l[i][2])+'\n')
              #tape.write(' p   '+str(1)+' 1.0 '+ str(l[i])+'\n')
@@ -284,17 +307,18 @@ def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne
           for i in range(nbasis):
               tape.write(str(i+1+natoms)+' '+str(C[i,j])+'\n')
 
+
     if status:
       if write:
          tape = open(name+'.molden',"w")
          write_molden()
-         #update_system()
          tape.close()
+         return E_elec+E_nuc
     else:
        print('E_elec: '+str(E_elec)+'\n')
        print('E_nuc: '+str(E_nuc)+'\n')
        print('E_tot: '+str(E_nuc+E_elec)+'\n')
-       print 'SCF DID NOT CONVERGED'
+       print('SCF DID NOT CONVERGED')
        return 99999
      
     return E_elec+E_nuc
@@ -311,8 +335,6 @@ def penalty_inverse(alpha,coef3,x,y,z,l,charges,x_atom,y_atom,z_atom,natoms,nbas
     coef = np.ones(nbasis,dtype=dtype)
     coef = normalization(alpha,coef,l,nbasis)
     S = overlapmatrix2(alpha,coef,l,nbasis)
-    #print 'This is det S',np.linalg.det(S)
-    print 'This is eigen S',np.linalg.eigh(S)[0]
     penalty = lbda*1.0e-3/np.sqrt(np.linalg.det(S))
     return energy + penalty
 
