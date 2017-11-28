@@ -96,8 +96,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Task">diffiqult.Task</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Molecule">diffiqult.Molecule</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Energy">diffiqult.Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#diffiqult-optimize">diffiqult.Optimize</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../todo.html">Current features</a></li>
 </ul>
 
             
@@ -169,34 +171,43 @@
 <div class="viewcode-block" id="Getbasis"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Molecule.Getbasis">[docs]</a><span class="k">class</span> <span class="nc">Getbasis</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This class loads the basis function for a given molecule</span>
-<span class="sd">    Attributes</span>
-<span class="sd">    __________</span>
-<span class="sd">    alpha : array</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">     alpha : array</span>
 <span class="sd">           Gaussian withds</span>
-<span class="sd">    coef : array</span>
+<span class="sd">     coef : array</span>
 <span class="sd">          Contraction coefficients</span>
-<span class="sd">    xyz : array</span>
+<span class="sd">     xyz : array</span>
 <span class="sd">          Gaussian centers</span>
-<span class="sd">    list_contr : list</span>
+<span class="sd">     list_contr : list</span>
 <span class="sd">          List of integers with contractions, </span>
 <span class="sd">          eg. [3,3] are two AO with three primitives each</span>
-<span class="sd">    l      : list of tuples </span>
+<span class="sd">     l      : list of tuples </span>
 <span class="sd">           List of tuple of integers with angular momentums</span>
 <span class="sd">           eg. [(0,0,0),(0,1,0)] one s orbital and one p_x</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="Getbasis.__init__"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Molecule.Getbasis.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">molecule</span><span class="p">,</span><span class="n">basis</span><span class="p">,</span><span class="n">shifted</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">       molecule : list</span>
+<span class="sd">       </span>
+<span class="sd">       Parameters:</span>
+<span class="sd">         molecule : list</span>
 <span class="sd">                 It contains spects of geometry</span>
 <span class="sd">                 [( atomic_number_atom_1,(x,y,z), </span>
 <span class="sd">                    atomic_number_atom_1,(x,y,z),</span>
 <span class="sd">                    atomic_number_atom_1,(x,y,z)]</span>
 <span class="sd">                eg. water</span>
-<span class="sd">                .. code-block:: python</span>
 
 <span class="sd">                     (8,(0.0, 0.0, 0.091685801102911746)),</span>
 <span class="sd">                     (1,(1.4229678834888837, 0.0, -0.98120954931681137)),</span>
 <span class="sd">                     (1,(-1.4229678834888837, 0.0, -0.98120954931681137))]</span>
+<span class="sd">         basis : dict</span>
+<span class="sd">                {atomic_number: [(&#39;type&#39;,[(exp,coef),</span>
+<span class="sd">                                          (exp,coef)]),</span>
+<span class="sd">                                 (&#39;type&#39;,[(exp,coef),</span>
+<span class="sd">                                          (exp,coef)])],</span>
+<span class="sd">                 atomic_number: [(&#39;type&#39;,[(exp,coef),</span>
+<span class="sd">                                          (exp,coef)]),</span>
+<span class="sd">                                 (&#39;type&#39;,[(exp,coef),</span>
+<span class="sd">                                          (exp,coef)])]}</span>
 
 <span class="sd">       &#39;&#39;&#39;</span>
        <span class="c1"># It is just a class for know, just in case we want to do more pre-procesing</span>
@@ -207,14 +218,15 @@
        <span class="bp">self</span><span class="o">.</span><span class="n">list_contr</span> <span class="o">=</span> <span class="p">[]</span>
        <span class="bp">self</span><span class="o">.</span><span class="n">tot_prim</span> <span class="o">=</span> <span class="mi">0</span>
        <span class="k">if</span> <span class="n">shifted</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">get_shiftedbasis</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_get_shiftedbasis</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
        <span class="k">else</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">get_centeredbasis</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span><span class="n">basis</span><span class="p">)</span></div>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_get_centeredbasis</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span><span class="n">basis</span><span class="p">)</span></div>
     
-    <span class="k">def</span> <span class="nf">get_centeredbasis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">molecule</span><span class="p">,</span><span class="n">basis</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_centeredbasis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">molecule</span><span class="p">,</span><span class="n">basis</span><span class="p">):</span>
+       
        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">molecule</span><span class="p">:</span>
           <span class="k">for</span> <span class="n">contr</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">[</span><span class="n">atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
-              <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getl_xyz</span><span class="p">(</span><span class="n">contr</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span> 
+              <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getl_xyz</span><span class="p">(</span><span class="n">contr</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span> 
                   <span class="bp">self</span><span class="o">.</span><span class="n">list_contr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">contr</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
                   <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">atom</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">atom</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">atom</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]])</span>
                   <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
@@ -223,7 +235,7 @@
                       <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prim</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                       <span class="bp">self</span><span class="o">.</span><span class="n">tot_prim</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">get_shiftedbasis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">basis</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_shiftedbasis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">basis</span><span class="p">):</span>
        <span class="k">for</span> <span class="n">gauss</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">:</span>
            <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gauss</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
            <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gauss</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
@@ -231,7 +243,7 @@
            <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gauss</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
        <span class="k">return</span>
 
-    <span class="k">def</span> <span class="nf">getl_xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_getl_xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">l</span><span class="p">):</span>
        <span class="n">angular</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;S&#39;</span><span class="p">:[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)],</span>
                   <span class="s1">&#39;P&#39;</span><span class="p">:[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)]}</span>
        <span class="k">return</span> <span class="n">angular</span><span class="p">[</span><span class="n">l</span><span class="p">]</span></div>
@@ -239,7 +251,13 @@
 
 <div class="viewcode-block" id="Getgeom"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Molecule.Getgeom">[docs]</a><span class="k">class</span> <span class="nc">Getgeom</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    This class loads the moleculegeom</span>
+<span class="sd">    This class loads the geometry in xyz coordinates</span>
+<span class="sd">       Parameters:</span>
+<span class="sd">         molecule : list</span>
+<span class="sd">                 It contains spects of geometry</span>
+<span class="sd">                 [( atomic_number_atom_1,(x,y,z), </span>
+<span class="sd">                    atomic_number_atom_1,(x,y,z),</span>
+<span class="sd">                    atomic_number_atom_1,(x,y,z)]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">molecule</span><span class="p">):</span>
        <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># coordinates of atoms</span>
@@ -255,19 +273,18 @@
 <span class="sd">    This class contains all the information of the system</span>
 <span class="sd">    extracted from mol and basis</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    _____________</span>
+<span class="sd">    Parameters:</span>
 
-<span class="sd">    alpha : array</span>
+<span class="sd">     alpha : array</span>
 <span class="sd">           Gaussian withds</span>
-<span class="sd">    coef : array</span>
+<span class="sd">     coef : array</span>
 <span class="sd">          Contraction coefficients</span>
-<span class="sd">    xyz : array</span>
+<span class="sd">     xyz : array</span>
 <span class="sd">          Gaussian centers</span>
-<span class="sd">    list_contr : list</span>
+<span class="sd">     list_contr : list</span>
 <span class="sd">          List of integers with contractions, </span>
 <span class="sd">          eg. [3,3] are two AO with three primitives each</span>
-<span class="sd">    l      : list of tuples </span>
+<span class="sd">     l      : list of tuples </span>
 <span class="sd">           List of tuple of integers with angular momentums</span>
 <span class="sd">           eg. [(0,0,0),(0,1,0)] one s orbital and one p_x</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -276,13 +293,14 @@
          <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">         This function starts an object System_mol</span>
 
-<span class="sd">         mol : list</span>
+<span class="sd">         Parameters:</span>
+<span class="sd">           mol : list</span>
 <span class="sd">                It contains spects of geometry</span>
 <span class="sd">                 [( atomic_number_atom_1,(x,y,z), </span>
 <span class="sd">                    atomic_number_atom_1,(x,y,z),</span>
 <span class="sd">                    atomic_number_atom_1,(x,y,z)]</span>
 <span class="sd">    </span>
-<span class="sd">         basis: dict</span>
+<span class="sd">           basis: dict</span>
 <span class="sd">                {atomic_number: [(&#39;type&#39;,[(exp,coef),</span>
 <span class="sd">                                          (exp,coef)]),</span>
 <span class="sd">                                 (&#39;type&#39;,[(exp,coef),</span>
@@ -291,11 +309,18 @@
 <span class="sd">                                          (exp,coef)]),</span>
 <span class="sd">                                 (&#39;type&#39;,[(exp,coef),</span>
 <span class="sd">                                          (exp,coef)])]}</span>
-<span class="sd">         ne       : int</span>
+<span class="sd">           ne       : int</span>
 <span class="sd">                Number of electron</span>
-<span class="sd">         mol_name : str</span>
+<span class="sd">           mol_name : str</span>
 <span class="sd">                An id</span>
-<span class="sd">         shifted  : bool</span>
+<span class="sd">           shifted  : bool</span>
+<span class="sd">                False in case standard basis functions</span>
+
+<span class="sd">                True in case costumized basis functions</span>
+<span class="sd">           angs : bool</span>
+<span class="sd">                False is atomic units </span>
+<span class="sd"> </span>
+<span class="sd">                True if lenght units are angstroms </span>
 <span class="sd">                   </span>
 <span class="sd">         &#39;&#39;&#39;</span>
 
@@ -326,7 +351,12 @@
          <span class="k">return</span></div>
 
 <div class="viewcode-block" id="System_mol.printcurrentgeombasis"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Molecule.System_mol.printcurrentgeombasis">[docs]</a>    <span class="k">def</span> <span class="nf">printcurrentgeombasis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">tape</span><span class="p">):</span>
-       <span class="sd">&#39;&#39;&#39;This method prints the current values of sys on tape&#39;&#39;&#39;</span>
+       <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">       This method prints the current values of sys on tape</span>
+<span class="sd">       Parameters:</span>
+<span class="sd">           tape : file obj</span>
+<span class="sd">                Output file</span>
+<span class="sd">       &#39;&#39;&#39;</span>
        <span class="c1">### Atom coordinates</span>
        <span class="n">tape</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; Atomic coordinates</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>

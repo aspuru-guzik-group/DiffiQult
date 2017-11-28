@@ -96,8 +96,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Task">diffiqult.Task</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Molecule">diffiqult.Molecule</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Energy">diffiqult.Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#diffiqult-optimize">diffiqult.Optimize</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../todo.html">Current features</a></li>
 </ul>
 
             
@@ -239,44 +241,43 @@
 <div class="viewcode-block" id="rhfenergy"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Energy.rhfenergy">[docs]</a><span class="k">def</span> <span class="nf">rhfenergy</span><span class="p">(</span><span class="n">alpha_old</span><span class="p">,</span><span class="n">coef2</span><span class="p">,</span><span class="n">xyz</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">charges</span><span class="p">,</span><span class="n">xyz_atom</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">nbasis</span><span class="p">,</span><span class="n">contr_list</span><span class="p">,</span><span class="n">ne</span><span class="p">,</span><span class="n">max_scf</span><span class="p">,</span><span class="n">max_d</span><span class="p">,</span><span class="n">log</span><span class="p">,</span><span class="n">eigen</span><span class="p">,</span><span class="n">printguess</span><span class="p">,</span><span class="n">readguess</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">write</span><span class="p">,</span><span class="n">dtype</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This function returns the rhf function</span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ------------</span>
-<span class="sd">    alpha_old : array</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">     alpha_old : array</span>
 <span class="sd">                Gaussian exponents</span>
-<span class="sd">    coef2     : array</span>
+<span class="sd">     coef2     : array</span>
 <span class="sd">                Contraction coeffients</span>
-<span class="sd">    xyz       : array 3N</span>
+<span class="sd">     xyz       : array 3N</span>
 <span class="sd">                Gaussian centers</span>
-<span class="sd">    l         : array 3N</span>
+<span class="sd">     l         : array 3N</span>
 <span class="sd">                Angular momentum each entry is a vector</span>
 <span class="sd">                eg. s orbital (0,0,0) or pz (1,0,0)</span>
-<span class="sd">    charges   : array</span>
+<span class="sd">     charges   : array</span>
 <span class="sd">                Atom charges</span>
-<span class="sd">    nbasis    : int</span>
+<span class="sd">     nbasis    : int</span>
 <span class="sd">                Number of basis</span>
-<span class="sd">    contr_list: list of integers</span>
+<span class="sd">     contr_list: list of integers</span>
 <span class="sd">                Specify the number of orbitals in each atom</span>
-<span class="sd">    ne        : int</span>
+<span class="sd">     ne        : int</span>
 <span class="sd">                Number of electrons</span>
-<span class="sd">    max_scf   : int</span>
+<span class="sd">     max_scf   : int</span>
 <span class="sd">                maximum number of scf cycles</span>
-<span class="sd">    log       : bool</span>
+<span class="sd">     log       : bool</span>
 <span class="sd">                The exponents are given in log</span>
-<span class="sd">    printguess: str or None</span>
+<span class="sd">     printguess: str or None</span>
 <span class="sd">                File to print coeff matrix initial guess</span>
-<span class="sd">    readguess : str or None</span>
+<span class="sd">     readguess : str or None</span>
 <span class="sd">                File that contains coeff matrix initial guess</span>
-<span class="sd">    name      : str</span>
+<span class="sd">     name      : str</span>
 <span class="sd">                Output file name</span>
-<span class="sd">    write     : bool</span>
+<span class="sd">     write     : bool</span>
 <span class="sd">                True if printing</span>
-<span class="sd">    dtype     : type of output</span>
+<span class="sd">     dtype     : type of output</span>
 <span class="sd">                This is the directive to know if algopy will be used or not</span>
 <span class="sd">                np.float64(1.0) if it is a single point calculation</span>
 <span class="sd">                otherwise, it specify the size of the UTMP, autodifferentiation</span>
-<span class="sd">    Returns</span>
-<span class="sd">    _______</span>
-<span class="sd">    energy    : float</span>
+<span class="sd">    Returns:</span>
+<span class="sd">       energy    : float</span>
 <span class="sd">                RHF energy</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">tool_D</span> <span class="o">=</span> <span class="mf">1e-8</span>

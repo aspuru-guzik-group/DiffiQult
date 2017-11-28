@@ -38,9 +38,6 @@ ______________________________
 
      ``python setup.py install``
 
-* From pip:
-
-      ``pip install diffiqult``
 
 Usage
 ======================
@@ -132,7 +129,7 @@ For example:
                      argnum=[2],  # Optimization of centers
                      output=True) # We optimized all the steps
 
-where ``argnum`` recives a list with the parameters to optimize with the following convention:
+where ``argnum`` recieves a list with the parameters to optimize with the following convention:
 
 +--------------------------+------------+
 | Parameter                | ``argnum`` |

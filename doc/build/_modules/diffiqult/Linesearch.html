@@ -1,0 +1,1079 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>diffiqult.Linesearch &mdash; DiffiQulT 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="DiffiQulT 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> DiffiQulT
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">DiffiQult</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html#getting-started-with-diffiqult">Getting started with DiffiQult</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../diffiqult.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Task">diffiqult.Task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Molecule">diffiqult.Molecule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Energy">diffiqult.Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#diffiqult-optimize">diffiqult.Optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../todo.html">Current features</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DiffiQulT</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>diffiqult.Linesearch</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for diffiqult.Linesearch</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module was taken form Scipy</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: generated/</span>
+
+<span class="sd">    line_search_armijo</span>
+<span class="sd">    line_search_wolfe1</span>
+<span class="sd">    line_search_wolfe2</span>
+<span class="sd">    scalar_search_wolfe1</span>
+<span class="sd">    scalar_search_wolfe2</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minpack2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy._lib.six</span> <span class="k">import</span> <span class="n">xrange</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LineSearchWarning&#39;</span><span class="p">,</span> <span class="s1">&#39;line_search_wolfe1&#39;</span><span class="p">,</span> <span class="s1">&#39;line_search_wolfe2&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;scalar_search_wolfe1&#39;</span><span class="p">,</span> <span class="s1">&#39;scalar_search_wolfe2&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;line_search_armijo&#39;</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">LineSearchWarning</span><span class="p">(</span><span class="ne">RuntimeWarning</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Minpack&#39;s Wolfe line and scalar searches</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">line_search_wolfe1</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fprime</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">old_fval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">c1</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">amax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">amin</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+                       <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    As `scalar_search_wolfe1` but do a line search to direction `pk`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : callable</span>
+<span class="sd">        Function `f(x)`</span>
+<span class="sd">    fprime : callable</span>
+<span class="sd">        Gradient of `f`</span>
+<span class="sd">    xk : array_like</span>
+<span class="sd">        Current point</span>
+<span class="sd">    pk : array_like</span>
+<span class="sd">        Search direction</span>
+
+<span class="sd">    gfk : array_like, optional</span>
+<span class="sd">        Gradient of `f` at point `xk`</span>
+<span class="sd">    old_fval : float, optional</span>
+<span class="sd">        Value of `f` at point `xk`</span>
+<span class="sd">    old_old_fval : float, optional</span>
+<span class="sd">        Value of `f` at point preceding `xk`</span>
+
+<span class="sd">    The rest of the parameters are the same as for `scalar_search_wolfe1`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stp, f_count, g_count, fval, old_fval</span>
+<span class="sd">        As in `line_search_wolfe1`</span>
+<span class="sd">    gval : array</span>
+<span class="sd">        Gradient of `f` at the final point</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">gfk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">gfk</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fprime</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">fprime</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">newargs</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span> <span class="o">+</span> <span class="n">args</span>
+        <span class="n">gradient</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newargs</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">gradient</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">gval</span> <span class="o">=</span> <span class="p">[</span><span class="n">gfk</span><span class="p">]</span>
+    <span class="n">gc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">fc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">phi</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">xk</span> <span class="o">+</span> <span class="n">s</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">derphi</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">(</span><span class="n">xk</span> <span class="o">+</span> <span class="n">s</span><span class="o">*</span><span class="n">pk</span><span class="p">,</span> <span class="o">*</span><span class="n">newargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">gradient</span><span class="p">:</span>
+            <span class="n">gc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pk</span><span class="p">)</span>
+
+    <span class="n">derphi0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">gfk</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">pk</span><span class="p">))</span>
+
+    <span class="n">stp</span><span class="p">,</span> <span class="n">fval</span><span class="p">,</span> <span class="n">old_fval</span> <span class="o">=</span> <span class="n">scalar_search_wolfe1</span><span class="p">(</span>
+            <span class="n">phi</span><span class="p">,</span> <span class="n">derphi</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="p">,</span> <span class="n">derphi0</span><span class="p">,</span>
+            <span class="n">c1</span><span class="o">=</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="n">c2</span><span class="p">,</span> <span class="n">amax</span><span class="o">=</span><span class="n">amax</span><span class="p">,</span> <span class="n">amin</span><span class="o">=</span><span class="n">amin</span><span class="p">,</span> <span class="n">xtol</span><span class="o">=</span><span class="n">xtol</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stp</span><span class="p">,</span> <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">gc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fval</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">scalar_search_wolfe1</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">derphi</span><span class="p">,</span> <span class="n">phi0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">old_phi0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">derphi0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">c1</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                         <span class="n">amax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">amin</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scalar function search for alpha that satisfies strong Wolfe conditions</span>
+
+<span class="sd">    alpha &gt; 0 is assumed to be a descent direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    phi : callable phi(alpha)</span>
+<span class="sd">        Function at point `alpha`</span>
+<span class="sd">    derphi : callable dphi(alpha)</span>
+<span class="sd">        Derivative `d phi(alpha)/ds`. Returns a scalar.</span>
+
+<span class="sd">    phi0 : float, optional</span>
+<span class="sd">        Value of `f` at 0</span>
+<span class="sd">    old_phi0 : float, optional</span>
+<span class="sd">        Value of `f` at the previous point</span>
+<span class="sd">    derphi0 : float, optional</span>
+<span class="sd">        Value `derphi` at 0</span>
+<span class="sd">    c1, c2 : float, optional</span>
+<span class="sd">        Wolfe parameters</span>
+<span class="sd">    amax, amin : float, optional</span>
+<span class="sd">        Maximum and minimum step size</span>
+<span class="sd">    xtol : float, optional</span>
+<span class="sd">        Relative tolerance for an acceptable step.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    alpha : float</span>
+<span class="sd">        Step size, or None if no suitable step was found</span>
+<span class="sd">    phi : float</span>
+<span class="sd">        Value of `phi` at the new point `alpha`</span>
+<span class="sd">    phi0 : float</span>
+<span class="sd">        Value of `phi` at `alpha=0`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses routine DCSRCH from MINPACK.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">phi0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">phi0</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">derphi0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">derphi0</span> <span class="o">=</span> <span class="n">derphi</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">old_phi0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">derphi0</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">alpha1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.01</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">phi0</span> <span class="o">-</span> <span class="n">old_phi0</span><span class="p">)</span><span class="o">/</span><span class="n">derphi0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">alpha1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">alpha1</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">alpha1</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">phi1</span> <span class="o">=</span> <span class="n">phi0</span>
+    <span class="n">derphi1</span> <span class="o">=</span> <span class="n">derphi0</span>
+    <span class="n">isave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">)</span>
+    <span class="n">dsave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">13</span><span class="p">,),</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;START&#39;</span>
+
+    <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+        <span class="n">stp</span><span class="p">,</span> <span class="n">phi1</span><span class="p">,</span> <span class="n">derphi1</span><span class="p">,</span> <span class="n">task</span> <span class="o">=</span> <span class="n">minpack2</span><span class="o">.</span><span class="n">dcsrch</span><span class="p">(</span><span class="n">alpha1</span><span class="p">,</span> <span class="n">phi1</span><span class="p">,</span> <span class="n">derphi1</span><span class="p">,</span>
+                                                   <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">xtol</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span>
+                                                   <span class="n">amin</span><span class="p">,</span> <span class="n">amax</span><span class="p">,</span> <span class="n">isave</span><span class="p">,</span> <span class="n">dsave</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">task</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;FG&#39;</span><span class="p">:</span>
+            <span class="n">alpha1</span> <span class="o">=</span> <span class="n">stp</span>
+            <span class="n">phi1</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">stp</span><span class="p">)</span>
+            <span class="n">derphi1</span> <span class="o">=</span> <span class="n">derphi</span><span class="p">(</span><span class="n">stp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">phi1</span> <span class="o">==</span> <span class="mi">99999</span><span class="p">:</span>
+	    <span class="n">stp</span> <span class="o">=</span> <span class="kc">None</span>
+	    <span class="n">task</span> <span class="o">=</span> <span class="s1">&#39;SCF did not converged&#39;</span>
+            <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># maxiter reached, the line search did not converge</span>
+        <span class="n">stp</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">task</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;ERROR&#39;</span> <span class="ow">or</span> <span class="n">task</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;WARN&#39;</span><span class="p">:</span>
+        <span class="n">stp</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># failed</span>
+
+    <span class="k">return</span> <span class="n">stp</span><span class="p">,</span> <span class="n">phi1</span><span class="p">,</span> <span class="n">phi0</span>
+
+<span class="n">line_search</span> <span class="o">=</span> <span class="n">line_search_wolfe1</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Pure-Python Wolfe line and scalar searches</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">line_search_wolfe2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">myfprime</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">old_fval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">old_old_fval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">c1</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">amax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                       <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find alpha that satisfies strong Wolfe conditions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : callable f(x,*args)</span>
+<span class="sd">        Objective function.</span>
+<span class="sd">    myfprime : callable f&#39;(x,*args)</span>
+<span class="sd">        Objective function gradient.</span>
+<span class="sd">    xk : ndarray</span>
+<span class="sd">        Starting point.</span>
+<span class="sd">    pk : ndarray</span>
+<span class="sd">        Search direction.</span>
+<span class="sd">    gfk : ndarray, optional</span>
+<span class="sd">        Gradient value for x=xk (xk being the current parameter</span>
+<span class="sd">        estimate). Will be recomputed if omitted.</span>
+<span class="sd">    old_fval : float, optional</span>
+<span class="sd">        Function value for x=xk. Will be recomputed if omitted.</span>
+<span class="sd">    old_old_fval : float, optional</span>
+<span class="sd">        Function value for the point preceding x=xk</span>
+<span class="sd">    args : tuple, optional</span>
+<span class="sd">        Additional arguments passed to objective function.</span>
+<span class="sd">    c1 : float, optional</span>
+<span class="sd">        Parameter for Armijo condition rule.</span>
+<span class="sd">    c2 : float, optional</span>
+<span class="sd">        Parameter for curvature condition rule.</span>
+<span class="sd">    amax : float, optional</span>
+<span class="sd">        Maximum step size</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    alpha : float or None</span>
+<span class="sd">        Alpha for which ``x_new = x0 + alpha * pk``,</span>
+<span class="sd">        or None if the line search algorithm did not converge.</span>
+<span class="sd">    fc : int</span>
+<span class="sd">        Number of function evaluations made.</span>
+<span class="sd">    gc : int</span>
+<span class="sd">        Number of gradient evaluations made.</span>
+<span class="sd">    new_fval : float or None</span>
+<span class="sd">        New function value ``f(x_new)=f(x0+alpha*pk)``,</span>
+<span class="sd">        or None if the line search algorithm did not converge.</span>
+<span class="sd">    old_fval : float</span>
+<span class="sd">        Old function value ``f(x0)``.</span>
+<span class="sd">    new_slope : float or None</span>
+<span class="sd">        The local slope along the search direction at the</span>
+<span class="sd">        new value ``&lt;myfprime(x_new), pk&gt;``,</span>
+<span class="sd">        or None if the line search algorithm did not converge.</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses the line search algorithm to enforce strong Wolfe</span>
+<span class="sd">    conditions.  See Wright and Nocedal, &#39;Numerical Optimization&#39;,</span>
+<span class="sd">    1999, pg. 59-60.</span>
+
+<span class="sd">    For the zoom phase it uses an algorithm by [...].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">gc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">gval</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">phi</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+        <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">xk</span><span class="o">+</span><span class="n">alpha</span><span class="o">*</span> <span class="n">pk</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">myfprime</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">derphi</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+            <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">eps</span> <span class="o">=</span> <span class="n">myfprime</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">fprime</span> <span class="o">=</span> <span class="n">myfprime</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">newargs</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span> <span class="o">+</span> <span class="n">args</span>
+            <span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">(</span><span class="n">xk</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">pk</span><span class="p">,</span> <span class="o">*</span><span class="n">newargs</span><span class="p">)</span>  <span class="c1"># store for later use</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fprime</span> <span class="o">=</span> <span class="n">myfprime</span>
+
+        <span class="k">def</span> <span class="nf">derphi</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+            <span class="n">gc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">(</span><span class="n">xk</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">pk</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>  <span class="c1"># store for later use</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pk</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">gfk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">gfk</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">derphi0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">gfk</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+
+    <span class="n">alpha_star</span><span class="p">,</span> <span class="n">phi_star</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">derphi_star</span> <span class="o">=</span> <span class="n">scalar_search_wolfe2</span><span class="p">(</span>
+            <span class="n">phi</span><span class="p">,</span> <span class="n">derphi</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="p">,</span> <span class="n">derphi0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">amax</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">derphi_star</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The line search algorithm did not converge&#39;</span><span class="p">,</span> <span class="n">LineSearchWarning</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># derphi_star is a number (derphi) -- so use the most recently</span>
+        <span class="c1"># calculated gradient used in computing it derphi = gfk*pk</span>
+        <span class="c1"># this is the gradient at the next step no need to compute it</span>
+        <span class="c1"># again in the outer loop.</span>
+        <span class="n">derphi_star</span> <span class="o">=</span> <span class="n">gval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">alpha_star</span><span class="p">,</span> <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">gc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_star</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">derphi_star</span>
+
+
+<span class="k">def</span> <span class="nf">scalar_search_wolfe2</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">derphi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">old_phi0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">derphi0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">c1</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">amax</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find alpha that satisfies strong Wolfe conditions.</span>
+
+<span class="sd">    alpha &gt; 0 is assumed to be a descent direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    phi : callable f(x)</span>
+<span class="sd">        Objective scalar function.</span>
+<span class="sd">    derphi : callable f&#39;(x), optional</span>
+<span class="sd">        Objective function derivative (can be None)</span>
+<span class="sd">    phi0 : float, optional</span>
+<span class="sd">        Value of phi at s=0</span>
+<span class="sd">    old_phi0 : float, optional</span>
+<span class="sd">        Value of phi at previous point</span>
+<span class="sd">    derphi0 : float, optional</span>
+<span class="sd">        Value of derphi at s=0</span>
+<span class="sd">    c1 : float, optional</span>
+<span class="sd">        Parameter for Armijo condition rule.</span>
+<span class="sd">    c2 : float, optional</span>
+<span class="sd">        Parameter for curvature condition rule.</span>
+<span class="sd">    amax : float, optional</span>
+<span class="sd">        Maximum step size</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    alpha_star : float or None</span>
+<span class="sd">        Best alpha, or None if the line search algorithm did not converge.</span>
+<span class="sd">    phi_star : float</span>
+<span class="sd">        phi at alpha_star</span>
+<span class="sd">    phi0 : float</span>
+<span class="sd">        phi at 0</span>
+<span class="sd">    derphi_star : float or None</span>
+<span class="sd">        derphi at alpha_star, or None if the line search algorithm</span>
+<span class="sd">        did not converge.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses the line search algorithm to enforce strong Wolfe</span>
+<span class="sd">    conditions.  See Wright and Nocedal, &#39;Numerical Optimization&#39;,</span>
+<span class="sd">    1999, pg. 59-60.</span>
+
+<span class="sd">    For the zoom phase it uses an algorithm by [...].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">phi0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">phi0</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">derphi0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">derphi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">derphi0</span> <span class="o">=</span> <span class="n">derphi</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+
+    <span class="n">alpha0</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">old_phi0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">derphi0</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">alpha1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.01</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">phi0</span> <span class="o">-</span> <span class="n">old_phi0</span><span class="p">)</span><span class="o">/</span><span class="n">derphi0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">alpha1</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="k">if</span> <span class="n">alpha1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">alpha1</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="k">if</span> <span class="n">alpha1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># This shouldn&#39;t happen. Perhaps the increment has slipped below</span>
+        <span class="c1"># machine precision?  For now, set the return variables skip the</span>
+        <span class="c1"># useless while loop, and raise warnflag=2 due to possible imprecision.</span>
+        <span class="n">alpha_star</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">phi_star</span> <span class="o">=</span> <span class="n">phi0</span>
+        <span class="n">phi0</span> <span class="o">=</span> <span class="n">old_phi0</span>
+        <span class="n">derphi_star</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">phi_a1</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">alpha1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">phi_a1</span> <span class="o">==</span> <span class="mi">99999</span><span class="p">:</span>
+	<span class="k">return</span> 
+    <span class="c1">#derphi_a1 = derphi(alpha1)  evaluated below</span>
+
+    <span class="n">phi_a0</span> <span class="o">=</span> <span class="n">phi0</span>
+    <span class="n">derphi_a0</span> <span class="o">=</span> <span class="n">derphi0</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">alpha1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">phi_a1</span> <span class="o">&gt;</span> <span class="n">phi0</span> <span class="o">+</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">alpha1</span> <span class="o">*</span> <span class="n">derphi0</span><span class="p">)</span> <span class="ow">or</span> \
+           <span class="p">((</span><span class="n">phi_a1</span> <span class="o">&gt;=</span> <span class="n">phi_a0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">alpha_star</span><span class="p">,</span> <span class="n">phi_star</span><span class="p">,</span> <span class="n">derphi_star</span> <span class="o">=</span> \
+                        <span class="n">_zoom</span><span class="p">(</span><span class="n">alpha0</span><span class="p">,</span> <span class="n">alpha1</span><span class="p">,</span> <span class="n">phi_a0</span><span class="p">,</span>
+                              <span class="n">phi_a1</span><span class="p">,</span> <span class="n">derphi_a0</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">derphi</span><span class="p">,</span>
+                              <span class="n">phi0</span><span class="p">,</span> <span class="n">derphi0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span>
+            <span class="k">break</span>
+
+        <span class="n">derphi_a1</span> <span class="o">=</span> <span class="n">derphi</span><span class="p">(</span><span class="n">alpha1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">derphi_a1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">c2</span><span class="o">*</span><span class="n">derphi0</span><span class="p">):</span>
+            <span class="n">alpha_star</span> <span class="o">=</span> <span class="n">alpha1</span>
+            <span class="n">phi_star</span> <span class="o">=</span> <span class="n">phi_a1</span>
+            <span class="n">derphi_star</span> <span class="o">=</span> <span class="n">derphi_a1</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">derphi_a1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">alpha_star</span><span class="p">,</span> <span class="n">phi_star</span><span class="p">,</span> <span class="n">derphi_star</span> <span class="o">=</span> \
+                        <span class="n">_zoom</span><span class="p">(</span><span class="n">alpha1</span><span class="p">,</span> <span class="n">alpha0</span><span class="p">,</span> <span class="n">phi_a1</span><span class="p">,</span>
+                              <span class="n">phi_a0</span><span class="p">,</span> <span class="n">derphi_a1</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">derphi</span><span class="p">,</span>
+                              <span class="n">phi0</span><span class="p">,</span> <span class="n">derphi0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span>
+            <span class="k">break</span>
+
+        <span class="n">alpha2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">alpha1</span>   <span class="c1"># increase by factor of two on each iteration</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">alpha0</span> <span class="o">=</span> <span class="n">alpha1</span>
+        <span class="n">alpha1</span> <span class="o">=</span> <span class="n">alpha2</span>
+        <span class="n">phi_a0</span> <span class="o">=</span> <span class="n">phi_a1</span>
+        <span class="n">phi_a1</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">alpha1</span><span class="p">)</span>
+        <span class="n">derphi_a0</span> <span class="o">=</span> <span class="n">derphi_a1</span>
+
+        <span class="k">if</span> <span class="n">phi_a1</span> <span class="o">==</span> <span class="mi">99999</span><span class="p">:</span>
+	    <span class="n">stp</span> <span class="o">=</span> <span class="kc">None</span>
+	    <span class="n">task</span> <span class="o">=</span> <span class="s1">&#39;SCF did not converged&#39;</span>
+            <span class="k">break</span>
+
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># stopping test maxiter reached</span>
+        <span class="n">alpha_star</span> <span class="o">=</span> <span class="n">alpha1</span>
+        <span class="n">phi_star</span> <span class="o">=</span> <span class="n">phi_a1</span>
+        <span class="n">derphi_star</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The line search algorithm did not converge&#39;</span><span class="p">,</span> <span class="n">LineSearchWarning</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">alpha_star</span><span class="p">,</span> <span class="n">phi_star</span><span class="p">,</span> <span class="n">phi0</span><span class="p">,</span> <span class="n">derphi_star</span>
+
+
+<span class="k">def</span> <span class="nf">_cubicmin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">fa</span><span class="p">,</span> <span class="n">fpa</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">fb</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">fc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the minimizer for a cubic polynomial that goes through the</span>
+<span class="sd">    points (a,fa), (b,fb), and (c,fc) with derivative at a of fpa.</span>
+
+<span class="sd">    If no minimizer can be found return None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># f(x) = A *(x-a)^3 + B*(x-a)^2 + C*(x-a) + D</span>
+
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">over</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">fpa</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span>
+            <span class="n">dc</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="n">a</span>
+            <span class="n">denom</span> <span class="o">=</span> <span class="p">(</span><span class="n">db</span> <span class="o">*</span> <span class="n">dc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">db</span> <span class="o">-</span> <span class="n">dc</span><span class="p">)</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">d1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dc</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">d1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">db</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">d1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">dc</span> <span class="o">**</span> <span class="mi">3</span>
+            <span class="n">d1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span> <span class="o">**</span> <span class="mi">3</span>
+            <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">fb</span> <span class="o">-</span> <span class="n">fa</span> <span class="o">-</span> <span class="n">C</span> <span class="o">*</span> <span class="n">db</span><span class="p">,</span>
+                                            <span class="n">fc</span> <span class="o">-</span> <span class="n">fa</span> <span class="o">-</span> <span class="n">C</span> <span class="o">*</span> <span class="n">dc</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+            <span class="n">A</span> <span class="o">/=</span> <span class="n">denom</span>
+            <span class="n">B</span> <span class="o">/=</span> <span class="n">denom</span>
+            <span class="n">radical</span> <span class="o">=</span> <span class="n">B</span> <span class="o">*</span> <span class="n">B</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">A</span> <span class="o">*</span> <span class="n">C</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="n">B</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">radical</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">A</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ArithmeticError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">xmin</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">xmin</span>
+
+
+<span class="k">def</span> <span class="nf">_quadmin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">fa</span><span class="p">,</span> <span class="n">fpa</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">fb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the minimizer for a quadratic polynomial that goes through</span>
+<span class="sd">    the points (a,fa), (b,fb) with derivative at a of fpa,</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># f(x) = B*(x-a)^2 + C*(x-a) + D</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">over</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="n">fa</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">fpa</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">*</span> <span class="mf">1.0</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">fb</span> <span class="o">-</span> <span class="n">D</span> <span class="o">-</span> <span class="n">C</span> <span class="o">*</span> <span class="n">db</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">db</span> <span class="o">*</span> <span class="n">db</span><span class="p">)</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">C</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">B</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ArithmeticError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">xmin</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">xmin</span>
+
+
+<span class="k">def</span> <span class="nf">_zoom</span><span class="p">(</span><span class="n">a_lo</span><span class="p">,</span> <span class="n">a_hi</span><span class="p">,</span> <span class="n">phi_lo</span><span class="p">,</span> <span class="n">phi_hi</span><span class="p">,</span> <span class="n">derphi_lo</span><span class="p">,</span>
+          <span class="n">phi</span><span class="p">,</span> <span class="n">derphi</span><span class="p">,</span> <span class="n">phi0</span><span class="p">,</span> <span class="n">derphi0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Part of the optimization algorithm in `scalar_search_wolfe2`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">delta1</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># cubic interpolant check</span>
+    <span class="n">delta2</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># quadratic interpolant check</span>
+    <span class="n">phi_rec</span> <span class="o">=</span> <span class="n">phi0</span>
+    <span class="n">a_rec</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># interpolate to find a trial step length between a_lo and</span>
+        <span class="c1"># a_hi Need to choose interpolation here.  Use cubic</span>
+        <span class="c1"># interpolation and then if the result is within delta *</span>
+        <span class="c1"># dalpha or outside of the interval bounded by a_lo or a_hi</span>
+        <span class="c1"># then use quadratic interpolation, if the result is still too</span>
+        <span class="c1"># close, then use bisection</span>
+
+        <span class="n">dalpha</span> <span class="o">=</span> <span class="n">a_hi</span> <span class="o">-</span> <span class="n">a_lo</span>
+        <span class="k">if</span> <span class="n">dalpha</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a_hi</span><span class="p">,</span> <span class="n">a_lo</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a_lo</span><span class="p">,</span> <span class="n">a_hi</span>
+
+        <span class="c1"># minimizer of cubic interpolant</span>
+        <span class="c1"># (uses phi_lo, derphi_lo, phi_hi, and the most recent value of phi)</span>
+        <span class="c1">#</span>
+        <span class="c1"># if the result is too close to the end points (or out of the</span>
+        <span class="c1"># interval) then use quadratic interpolation with phi_lo,</span>
+        <span class="c1"># derphi_lo and phi_hi if the result is stil too close to the</span>
+        <span class="c1"># end points (or out of the interval) then use bisection</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">cchk</span> <span class="o">=</span> <span class="n">delta1</span> <span class="o">*</span> <span class="n">dalpha</span>
+            <span class="n">a_j</span> <span class="o">=</span> <span class="n">_cubicmin</span><span class="p">(</span><span class="n">a_lo</span><span class="p">,</span> <span class="n">phi_lo</span><span class="p">,</span> <span class="n">derphi_lo</span><span class="p">,</span> <span class="n">a_hi</span><span class="p">,</span> <span class="n">phi_hi</span><span class="p">,</span>
+                            <span class="n">a_rec</span><span class="p">,</span> <span class="n">phi_rec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a_j</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a_j</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="o">-</span> <span class="n">cchk</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a_j</span> <span class="o">&lt;</span> <span class="n">a</span> <span class="o">+</span> <span class="n">cchk</span><span class="p">):</span>
+            <span class="n">qchk</span> <span class="o">=</span> <span class="n">delta2</span> <span class="o">*</span> <span class="n">dalpha</span>
+            <span class="n">a_j</span> <span class="o">=</span> <span class="n">_quadmin</span><span class="p">(</span><span class="n">a_lo</span><span class="p">,</span> <span class="n">phi_lo</span><span class="p">,</span> <span class="n">derphi_lo</span><span class="p">,</span> <span class="n">a_hi</span><span class="p">,</span> <span class="n">phi_hi</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a_j</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a_j</span> <span class="o">&gt;</span> <span class="n">b</span><span class="o">-</span><span class="n">qchk</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a_j</span> <span class="o">&lt;</span> <span class="n">a</span><span class="o">+</span><span class="n">qchk</span><span class="p">):</span>
+                <span class="n">a_j</span> <span class="o">=</span> <span class="n">a_lo</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dalpha</span>
+
+        <span class="c1"># Check new value of a_j</span>
+
+        <span class="n">phi_aj</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">a_j</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">phi_aj</span> <span class="o">&gt;</span> <span class="n">phi0</span> <span class="o">+</span> <span class="n">c1</span><span class="o">*</span><span class="n">a_j</span><span class="o">*</span><span class="n">derphi0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">phi_aj</span> <span class="o">&gt;=</span> <span class="n">phi_lo</span><span class="p">):</span>
+            <span class="n">phi_rec</span> <span class="o">=</span> <span class="n">phi_hi</span>
+            <span class="n">a_rec</span> <span class="o">=</span> <span class="n">a_hi</span>
+            <span class="n">a_hi</span> <span class="o">=</span> <span class="n">a_j</span>
+            <span class="n">phi_hi</span> <span class="o">=</span> <span class="n">phi_aj</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">derphi_aj</span> <span class="o">=</span> <span class="n">derphi</span><span class="p">(</span><span class="n">a_j</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">derphi_aj</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">c2</span><span class="o">*</span><span class="n">derphi0</span><span class="p">:</span>
+                <span class="n">a_star</span> <span class="o">=</span> <span class="n">a_j</span>
+                <span class="n">val_star</span> <span class="o">=</span> <span class="n">phi_aj</span>
+                <span class="n">valprime_star</span> <span class="o">=</span> <span class="n">derphi_aj</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">derphi_aj</span><span class="o">*</span><span class="p">(</span><span class="n">a_hi</span> <span class="o">-</span> <span class="n">a_lo</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">phi_rec</span> <span class="o">=</span> <span class="n">phi_hi</span>
+                <span class="n">a_rec</span> <span class="o">=</span> <span class="n">a_hi</span>
+                <span class="n">a_hi</span> <span class="o">=</span> <span class="n">a_lo</span>
+                <span class="n">phi_hi</span> <span class="o">=</span> <span class="n">phi_lo</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">phi_rec</span> <span class="o">=</span> <span class="n">phi_lo</span>
+                <span class="n">a_rec</span> <span class="o">=</span> <span class="n">a_lo</span>
+            <span class="n">a_lo</span> <span class="o">=</span> <span class="n">a_j</span>
+            <span class="n">phi_lo</span> <span class="o">=</span> <span class="n">phi_aj</span>
+            <span class="n">derphi_lo</span> <span class="o">=</span> <span class="n">derphi_aj</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">maxiter</span><span class="p">):</span>
+            <span class="c1"># Failed to find a conforming step size</span>
+            <span class="n">a_star</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">val_star</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">valprime_star</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">a_star</span><span class="p">,</span> <span class="n">val_star</span><span class="p">,</span> <span class="n">valprime_star</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Armijo line and scalar searches</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">line_search_armijo</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">c1</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">alpha0</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Minimize over alpha, the function ``f(xk+alpha pk)``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : callable</span>
+<span class="sd">        Function to be minimized.</span>
+<span class="sd">    xk : array_like</span>
+<span class="sd">        Current point.</span>
+<span class="sd">    pk : array_like</span>
+<span class="sd">        Search direction.</span>
+<span class="sd">    gfk : array_like</span>
+<span class="sd">        Gradient of `f` at point `xk`.</span>
+<span class="sd">    old_fval : float</span>
+<span class="sd">        Value of `f` at point `xk`.</span>
+<span class="sd">    args : tuple, optional</span>
+<span class="sd">        Optional arguments.</span>
+<span class="sd">    c1 : float, optional</span>
+<span class="sd">        Value to control stopping criterion.</span>
+<span class="sd">    alpha0 : scalar, optional</span>
+<span class="sd">        Value of `alpha` at start of the optimization.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    alpha</span>
+<span class="sd">    f_count</span>
+<span class="sd">    f_val_at_alpha</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses the interpolation algorithm (Armijo backtracking) as suggested by</span>
+<span class="sd">    Wright and Nocedal in &#39;Numerical Optimization&#39;, 1999, pg. 56-57</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+    <span class="n">fc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">phi</span><span class="p">(</span><span class="n">alpha1</span><span class="p">):</span>
+        <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">xk</span> <span class="o">+</span> <span class="n">alpha1</span><span class="o">*</span><span class="n">pk</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">old_fval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">phi0</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phi0</span> <span class="o">=</span> <span class="n">old_fval</span>  <span class="c1"># compute f(xk) -- done in past loop</span>
+
+    <span class="n">derphi0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">gfk</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+    <span class="n">alpha</span><span class="p">,</span> <span class="n">phi1</span> <span class="o">=</span> <span class="n">scalar_search_armijo</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">phi0</span><span class="p">,</span> <span class="n">derphi0</span><span class="p">,</span> <span class="n">c1</span><span class="o">=</span><span class="n">c1</span><span class="p">,</span>
+                                       <span class="n">alpha0</span><span class="o">=</span><span class="n">alpha0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi1</span>
+
+
+<span class="k">def</span> <span class="nf">line_search_BFGS</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">c1</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">alpha0</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compatibility wrapper for `line_search_armijo`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">line_search_armijo</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">c1</span><span class="o">=</span><span class="n">c1</span><span class="p">,</span>
+                           <span class="n">alpha0</span><span class="o">=</span><span class="n">alpha0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">scalar_search_armijo</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">phi0</span><span class="p">,</span> <span class="n">derphi0</span><span class="p">,</span> <span class="n">c1</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">alpha0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">amin</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Minimize over alpha, the function ``phi(alpha)``.</span>
+
+<span class="sd">    Uses the interpolation algorithm (Armijo backtracking) as suggested by</span>
+<span class="sd">    Wright and Nocedal in &#39;Numerical Optimization&#39;, 1999, pg. 56-57</span>
+
+<span class="sd">    alpha &gt; 0 is assumed to be a descent direction.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    alpha</span>
+<span class="sd">    phi1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">phi_a0</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">alpha0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">phi_a0</span> <span class="o">&lt;=</span> <span class="n">phi0</span> <span class="o">+</span> <span class="n">c1</span><span class="o">*</span><span class="n">alpha0</span><span class="o">*</span><span class="n">derphi0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">alpha0</span><span class="p">,</span> <span class="n">phi_a0</span>
+
+    <span class="c1"># Otherwise compute the minimizer of a quadratic interpolant:</span>
+
+    <span class="n">alpha1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">derphi0</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha0</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">phi_a0</span> <span class="o">-</span> <span class="n">phi0</span> <span class="o">-</span> <span class="n">derphi0</span> <span class="o">*</span> <span class="n">alpha0</span><span class="p">)</span>
+    <span class="n">phi_a1</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">alpha1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">phi_a1</span> <span class="o">&lt;=</span> <span class="n">phi0</span> <span class="o">+</span> <span class="n">c1</span><span class="o">*</span><span class="n">alpha1</span><span class="o">*</span><span class="n">derphi0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">alpha1</span><span class="p">,</span> <span class="n">phi_a1</span>
+
+    <span class="c1"># Otherwise loop with cubic interpolation until we find an alpha which</span>
+    <span class="c1"># satifies the first Wolfe condition (since we are backtracking, we will</span>
+    <span class="c1"># assume that the value of alpha is not too small and satisfies the second</span>
+    <span class="c1"># condition.</span>
+
+    <span class="k">while</span> <span class="n">alpha1</span> <span class="o">&gt;</span> <span class="n">amin</span><span class="p">:</span>       <span class="c1"># we are assuming alpha&gt;0 is a descent direction</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="n">alpha0</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">alpha1</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha1</span><span class="o">-</span><span class="n">alpha0</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">alpha0</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">phi_a1</span> <span class="o">-</span> <span class="n">phi0</span> <span class="o">-</span> <span class="n">derphi0</span><span class="o">*</span><span class="n">alpha1</span><span class="p">)</span> <span class="o">-</span> \
+            <span class="n">alpha1</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">phi_a0</span> <span class="o">-</span> <span class="n">phi0</span> <span class="o">-</span> <span class="n">derphi0</span><span class="o">*</span><span class="n">alpha0</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">factor</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha0</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">phi_a1</span> <span class="o">-</span> <span class="n">phi0</span> <span class="o">-</span> <span class="n">derphi0</span><span class="o">*</span><span class="n">alpha1</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="n">alpha1</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">phi_a0</span> <span class="o">-</span> <span class="n">phi0</span> <span class="o">-</span> <span class="n">derphi0</span><span class="o">*</span><span class="n">alpha0</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">/</span> <span class="n">factor</span>
+
+        <span class="n">alpha2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">derphi0</span><span class="p">)))</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">phi_a2</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">alpha2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">phi_a2</span> <span class="o">&lt;=</span> <span class="n">phi0</span> <span class="o">+</span> <span class="n">c1</span><span class="o">*</span><span class="n">alpha2</span><span class="o">*</span><span class="n">derphi0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">alpha2</span><span class="p">,</span> <span class="n">phi_a2</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">alpha1</span> <span class="o">-</span> <span class="n">alpha2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">alpha1</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="ow">or</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha2</span><span class="o">/</span><span class="n">alpha1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.96</span><span class="p">:</span>
+            <span class="n">alpha2</span> <span class="o">=</span> <span class="n">alpha1</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+        <span class="n">alpha0</span> <span class="o">=</span> <span class="n">alpha1</span>
+        <span class="n">alpha1</span> <span class="o">=</span> <span class="n">alpha2</span>
+        <span class="n">phi_a0</span> <span class="o">=</span> <span class="n">phi_a1</span>
+        <span class="n">phi_a1</span> <span class="o">=</span> <span class="n">phi_a2</span>
+
+    <span class="c1"># Failed to find a suitable step length</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phi_a1</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Non-monotone line search for DF-SANE</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">_nonmonotone_line_search_cruz</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x_k</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">prev_fs</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span>
+                                  <span class="n">gamma</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">tau_min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">tau_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Nonmonotone backtracking line search as described in [1]_</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : callable</span>
+<span class="sd">        Function returning a tuple ``(f, F)`` where ``f`` is the value</span>
+<span class="sd">        of a merit function and ``F`` the residual.</span>
+<span class="sd">    x_k : ndarray</span>
+<span class="sd">        Initial position</span>
+<span class="sd">    d : ndarray</span>
+<span class="sd">        Search direction</span>
+<span class="sd">    prev_fs : float</span>
+<span class="sd">        List of previous merit function values. Should have ``len(prev_fs) &lt;= M``</span>
+<span class="sd">        where ``M`` is the nonmonotonicity window parameter.</span>
+<span class="sd">    eta : float</span>
+<span class="sd">        Allowed merit function increase, see [1]_</span>
+<span class="sd">    gamma, tau_min, tau_max : float, optional</span>
+<span class="sd">        Search parameters, see [1]_</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    alpha : float</span>
+<span class="sd">        Step length</span>
+<span class="sd">    xp : ndarray</span>
+<span class="sd">        Next position</span>
+<span class="sd">    fp : float</span>
+<span class="sd">        Merit function value at next position</span>
+<span class="sd">    Fp : ndarray</span>
+<span class="sd">        Residual at next position</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] &quot;Spectral residual method without gradient information for solving</span>
+<span class="sd">        large-scale nonlinear systems of equations.&quot; W. La Cruz,</span>
+<span class="sd">        J.M. Martinez, M. Raydan. Math. Comp. **75**, 1429 (2006).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f_k</span> <span class="o">=</span> <span class="n">prev_fs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">f_bar</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">prev_fs</span><span class="p">)</span>
+
+    <span class="n">alpha_p</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">alpha_m</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">x_k</span> <span class="o">+</span> <span class="n">alpha_p</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">fp</span><span class="p">,</span> <span class="n">Fp</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fp</span> <span class="o">&lt;=</span> <span class="n">f_bar</span> <span class="o">+</span> <span class="n">eta</span> <span class="o">-</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">alpha_p</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_p</span>
+            <span class="k">break</span>
+
+        <span class="n">alpha_tp</span> <span class="o">=</span> <span class="n">alpha_p</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span> <span class="o">/</span> <span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">alpha_p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">f_k</span><span class="p">)</span>
+
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">x_k</span> <span class="o">-</span> <span class="n">alpha_m</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">fp</span><span class="p">,</span> <span class="n">Fp</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fp</span> <span class="o">&lt;=</span> <span class="n">f_bar</span> <span class="o">+</span> <span class="n">eta</span> <span class="o">-</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">alpha_m</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha_m</span>
+            <span class="k">break</span>
+
+        <span class="n">alpha_tm</span> <span class="o">=</span> <span class="n">alpha_m</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span> <span class="o">/</span> <span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">alpha_m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">f_k</span><span class="p">)</span>
+
+        <span class="n">alpha_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha_tp</span><span class="p">,</span> <span class="n">tau_min</span> <span class="o">*</span> <span class="n">alpha_p</span><span class="p">,</span> <span class="n">tau_max</span> <span class="o">*</span> <span class="n">alpha_p</span><span class="p">)</span>
+        <span class="n">alpha_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha_tm</span><span class="p">,</span> <span class="n">tau_min</span> <span class="o">*</span> <span class="n">alpha_m</span><span class="p">,</span> <span class="n">tau_max</span> <span class="o">*</span> <span class="n">alpha_m</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">Fp</span>
+
+
+<span class="k">def</span> <span class="nf">_nonmonotone_line_search_cheng</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x_k</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">f_k</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span>
+                                   <span class="n">gamma</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">tau_min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">tau_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                                   <span class="n">nu</span><span class="o">=</span><span class="mf">0.85</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Nonmonotone line search from [1]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : callable</span>
+<span class="sd">        Function returning a tuple ``(f, F)`` where ``f`` is the value</span>
+<span class="sd">        of a merit function and ``F`` the residual.</span>
+<span class="sd">    x_k : ndarray</span>
+<span class="sd">        Initial position</span>
+<span class="sd">    d : ndarray</span>
+<span class="sd">        Search direction</span>
+<span class="sd">    f_k : float</span>
+<span class="sd">        Initial merit function value</span>
+<span class="sd">    C, Q : float</span>
+<span class="sd">        Control parameters. On the first iteration, give values</span>
+<span class="sd">        Q=1.0, C=f_k</span>
+<span class="sd">    eta : float</span>
+<span class="sd">        Allowed merit function increase, see [1]_</span>
+<span class="sd">    nu, gamma, tau_min, tau_max : float, optional</span>
+<span class="sd">        Search parameters, see [1]_</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    alpha : float</span>
+<span class="sd">        Step length</span>
+<span class="sd">    xp : ndarray</span>
+<span class="sd">        Next position</span>
+<span class="sd">    fp : float</span>
+<span class="sd">        Merit function value at next position</span>
+<span class="sd">    Fp : ndarray</span>
+<span class="sd">        Residual at next position</span>
+<span class="sd">    C : float</span>
+<span class="sd">        New value for the control parameter C</span>
+<span class="sd">    Q : float</span>
+<span class="sd">        New value for the control parameter Q</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] W. Cheng &amp; D.-H. Li, &#39;&#39;A derivative-free nonmonotone line</span>
+<span class="sd">           search and its application to the spectral residual</span>
+<span class="sd">           method&#39;&#39;, IMA J. Numer. Anal. 29, 814 (2009).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">alpha_p</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">alpha_m</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">x_k</span> <span class="o">+</span> <span class="n">alpha_p</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">fp</span><span class="p">,</span> <span class="n">Fp</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fp</span> <span class="o">&lt;=</span> <span class="n">C</span> <span class="o">+</span> <span class="n">eta</span> <span class="o">-</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">alpha_p</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_p</span>
+            <span class="k">break</span>
+
+        <span class="n">alpha_tp</span> <span class="o">=</span> <span class="n">alpha_p</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span> <span class="o">/</span> <span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">alpha_p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">f_k</span><span class="p">)</span>
+
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">x_k</span> <span class="o">-</span> <span class="n">alpha_m</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">fp</span><span class="p">,</span> <span class="n">Fp</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fp</span> <span class="o">&lt;=</span> <span class="n">C</span> <span class="o">+</span> <span class="n">eta</span> <span class="o">-</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">alpha_m</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha_m</span>
+            <span class="k">break</span>
+
+        <span class="n">alpha_tm</span> <span class="o">=</span> <span class="n">alpha_m</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_k</span> <span class="o">/</span> <span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">alpha_m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">f_k</span><span class="p">)</span>
+
+        <span class="n">alpha_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha_tp</span><span class="p">,</span> <span class="n">tau_min</span> <span class="o">*</span> <span class="n">alpha_p</span><span class="p">,</span> <span class="n">tau_max</span> <span class="o">*</span> <span class="n">alpha_p</span><span class="p">)</span>
+        <span class="n">alpha_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha_tm</span><span class="p">,</span> <span class="n">tau_min</span> <span class="o">*</span> <span class="n">alpha_m</span><span class="p">,</span> <span class="n">tau_max</span> <span class="o">*</span> <span class="n">alpha_m</span><span class="p">)</span>
+
+    <span class="c1"># Update C and Q</span>
+    <span class="n">Q_next</span> <span class="o">=</span> <span class="n">nu</span> <span class="o">*</span> <span class="n">Q</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">nu</span> <span class="o">*</span> <span class="n">Q</span> <span class="o">*</span> <span class="p">(</span><span class="n">C</span> <span class="o">+</span> <span class="n">eta</span><span class="p">)</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span> <span class="o">/</span> <span class="n">Q_next</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Q_next</span>
+
+    <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">Fp</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Q</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, ttamayo.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
