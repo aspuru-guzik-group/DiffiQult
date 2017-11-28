@@ -53,7 +53,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'DiffiQulT'
+project = u'DiffiQult'
 copyright = u'2017, ttamayo'
 author = u'ttamayo'
 
@@ -145,7 +145,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'DiffiQulT.tex', u'DiffiQulT Documentation',
+    (master_doc, 'DiffiQult.tex', u'DiffiQult Documentation',
      u'ttamayo', 'manual'),
 ]
 
@@ -155,7 +155,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'diffiqult', u'DiffiQulT Documentation',
+    (master_doc, 'diffiqult', u'DiffiQult Documentation',
      [author], 1)
 ]
 
@@ -166,8 +166,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'DiffiQulT', u'DiffiQulT Documentation',
-     author, 'DiffiQulT', 'One line description of project.',
+    (master_doc, 'DiffiQult', u'DiffiQult Documentation',
+     author, 'DiffiQult', 'One line description of project.',
      'Miscellaneous'),
 ]
 
