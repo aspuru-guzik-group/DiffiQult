@@ -38,9 +38,6 @@ ______________________________
 
      ``python setup.py install``
 
-* From pip:
-
-      ``pip install diffiqult``
 
 Usage
 ======================
