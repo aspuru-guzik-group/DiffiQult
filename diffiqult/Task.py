@@ -17,41 +17,44 @@ This module contain manages all tasks:
 
 class Tasks(object):
      '''This class manage the implemented tasks over a system included
-        in DiffiQult
+        in DiffiQult.
 
-        Attributes
-        __________
+        Attributes:
         
-        sys  : System_mol object
+         sys  : System_mol object
                Contains the basis functions, geometry and information of the a molecular system.
-        name : string
-               An id of the task, it is used as prefix for outputs
-        verbose: bool
-               It defines the output and screen options
-               True it prints in screen all details and a file "name.out"
-        status: bool
+         name : string
+               An id of the task, it is used as prefix for outputs.
+         verbose: bool
+               It defines the output and screen options.
+
+               True it prints in screen all details and a file "name.out".
+         status: bool
                Keep track of the success of the different task.
-               True the SCF and/or the optimization converged
+
+               True the SCF and/or the optimization converged.
 
      '''
      def __init__(self,mol,name,verbose=False):
           '''
-          Initialize molecular metadata which defines class.
+          Initialize task object that contains the inital parameters.
 
-          Parameters
-	  __________
+          Parameters:
+
              mol  : System_mol object
                     Contains the basis functions, geometry and information of the a molecular system.
              name : string
-                    An id of the task, it is used as prefix for outputs
-          Options
-	  __________
+                    An id of the task, it is used as prefix for outputs.
+
+          Options:
              verbose : bool
-                     It defines the output and screen options
+                     It defines the output and screen options.
+
                      True it prints in screen all details and a file "name.out"
              status: bool
                      Keep track of the success of the different task.
-                     True the SCF and/or the optimization converged
+
+                     True the SCF and/or the optimization converged.
           '''
           self.name = name
           self.sys = mol
@@ -63,7 +66,7 @@ class Tasks(object):
           self._select_task ={
               "Energy": self.energy,
               "Opt": self.optimization,
-              "Grad": self.energy_gradss,
+              "Grad": self._energy_gradss,
           }
           self.select_method ={
               'BFGS': self._BFGS,
@@ -320,18 +323,22 @@ class Tasks(object):
 
      def optimization(self,max_scf=100,log=True,scf=True,name='Output',readguess=None,output=False,argnum=[0],**kwargs):
         '''
-        This function handdles the optimization procedure 
+        This function handdles the optimization procedure.
 
-        Parameters
-        __________
+        Options:
+
         argnum : list of integers
                 Parameter to optimize
-                0 widths
-                1 contraction coefficients
-                2 Gaussian centers
+
+                0:widths
+
+                1: contraction coefficients
+
+                2:Gaussian centers
+
                 e.g. [0,1] to optimized widhts and contraction coefficients
         max_scf : integer
-                 maximum number of scf steps, default 30
+                 Maximum number of scf steps, default 30
         log     : bool
                  If we are not optimizing the log of exponent, we highly recoment leave it as True, the default.
         name    : str
@@ -355,14 +362,17 @@ class Tasks(object):
         '''
         This function handdles the single point calculations
 
-        Parameters
-        __________
+        Options:
+
         max_scf : integer
-                 maximum number of scf steps, default 30
+                 Maximum number of scf steps, default 30.
         printguess : str 
-                 file path if it is requiered to prepare an inital guess for the molecular orbital coefficients
+
+                 File path if it is requiered to prepare an inital guess for the molecular orbital coefficients.
+
         output : bool
-                 True if it will print a molden file in case of success
+
+                 True if it will print a molden file in case of success.
         '''
         name = self.name+'-'+str(self.ntask)
         if self.verbose:
@@ -372,18 +382,24 @@ class Tasks(object):
 
      def runtask(self,task,**kwargs):
         ''' 
-         This method run a given task and if it has success, it uptates system with the most recent energy value and basis function
+        This method run a given task and if it has success, it uptates system with the most recent energy value and basis function
 
-        Parameters
-        _________
-        task : str
+        Parameters:
+
+          task : str
                If defines the task:
-              'Energy' is a single point calculation     
-              'Opt' an optimization of a given parameter
-        Returns
-        _________
-        success : bool
-                 True if task ended successfully
+
+              'Energy' is a single point calculation.
+
+              'Opt' an optimization of a given parameter.
+
+        Options:
+              Check documentation for each task
+
+        Returns:
+
+          success : bool
+                 True if task ended successfully.
         '''
         print(' Task: %s'%task)
         self.ntask += 1
@@ -394,7 +410,7 @@ class Tasks(object):
         if self.verbose:
             self.tape.write('\n')
 	function(**kwargs)
-        return self.success
+        return self.status
 
      def end(self):
         if self.verbose:

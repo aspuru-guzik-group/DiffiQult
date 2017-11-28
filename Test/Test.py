@@ -163,12 +163,12 @@ select_basis = {'h2' : basis_set,
                'ch4' : basis_set,
                'ch2o': basis_set_3G_STO,
                'hcn' : basis_set}
-test_mol_names = ['h2','h2o','ch4','hcn']
+test_mol_names = ['h2','h2o','ch4','hcn','ch2o']
 
 
 
 class System_test(System_mol):
-    def __init__(self,mol):
+    def __init__(self,mol,shifted=False):
           self.mol = select_geom.get(mol)
           System_mol.__init__(self,self.mol,select_basis.get(mol),select_e.get(mol),mol)
           self.tape = "./test/"+mol
@@ -341,7 +341,7 @@ class Test_Molecules(unittest.TestCase):
               alpha_epsilon[i] = Mol.alpha[i]+ epsilon
               Vij_epsilon  = nuclearmatrix(alpha_epsilon,Mol.coef,Mol.xyz,Mol.l,Mol.nbasis,Mol.charges,Mol.atom,Mol.natoms,Mol.list_contr,np.float64(1.0))
               dVij_da = (Vij_epsilon- V)/epsilon
-              np.testing.assert_almost_equal(dVij_da,grad_algo_alpha[:,:,i],decimal=3,verbose=True,err_msg='Error: Test Overlap Grad')
+              np.testing.assert_almost_equal(dVij_da,grad_algo_alpha[:,:,i],decimal=3,verbose=True,err_msg='Error: Test Nuclear Grad')
 
         grad_algo_coef = UTPM.extract_jacobian(nuclearmatrix(Mol.alpha,Mol.coef_algopy,Mol.xyz,Mol.l,Mol.nbasis,
                                                               Mol.charges,Mol.atom,Mol.natoms,Mol.list_contr,Mol.alpha_algopy))
@@ -349,9 +349,9 @@ class Test_Molecules(unittest.TestCase):
           for j in range(len(Mol.alpha)):
               coef_epsilon = np.copy(Mol.coef)
               coef_epsilon[i] = Mol.coef[i]+ epsilon
-              Tij_epsilon  = nuclearmatrix(Mol.alpha,coef_epsilon,Mol.xyz,Mol.l,Mol.nbasis,Mol.charges,Mol.atom,Mol.natoms,Mol.list_contr,np.float64(1.0))
-              dTij_da = (Tij_epsilon- V)/epsilon
-              np.testing.assert_almost_equal(dTij_da,grad_algo_alpha[:,:,i],decimal=3,verbose=True,err_msg='Error: Test Overlap Grad')
+              Vij_epsilon  = nuclearmatrix(Mol.alpha,coef_epsilon,Mol.xyz,Mol.l,Mol.nbasis,Mol.charges,Mol.atom,Mol.natoms,Mol.list_contr,np.float64(1.0))
+              dVij_da = (Vij_epsilon- V)/epsilon
+              np.testing.assert_almost_equal(dVij_da,grad_algo_coef[:,:,i],decimal=3,verbose=True,err_msg='Error: Test Nuclear Grad')
         pass
 
 
@@ -454,20 +454,42 @@ class Test_Molecules(unittest.TestCase):
             dE = (energy-energy_epsilon)/epsilon
         pass
 
+    def _test_bfgs(self):
+        from diffiqult.Optimize import rosen,rosen_der,algopy_wrapper,fmin_bfgs
+
+      
+        print ('    Testing optimizer ...start')
+        x0 = np.array([0.8, 1.2, 0.7])
+        x_not = np.array([1.0,1.0,1.0])
+        x1 = fmin_bfgs(rosen, x0, fprime=rosen_der,maxiter=80)
+        self.assertAlmostEqual(x_not,x1,msg="Error: Test optimizer with rosen ",places=6)
+
+        x1 = fmin_bfgs(rosen, x0, fprime=algopy_wrapper(rosen),gtol=1e-4, maxiter=100)
+        self.assertAlmostEqual(x_not,x1,msg="Error: Test optimizer with rosen and algopy",places=6)
+        print ('    Testing optimizer ...done')
+
+        pass
+
         
     def test_optimizer(self):
-        '''This function test the optmization, there is not beckmark yet :S
+        '''This function test the optmization, there is not bechmark yet :S
         for the moment there is just a way to check if is minimizes energy and
         if it doesn't break 
         the functions are taken from the module Wrap'''
         print ('Testing Optimization'+'...start')
-        for Mol in self.Molecules:
+        self._test_bfgs()
+        for mol in self.Molecules[0]:
             print ('    Testing '+Mol.mol_name+'...start')
-            optimization(Mol.mol,Mol.ne,basis_set,argnum=[0,5],name='test_alpha')
-            optimization(Mol.mol,Mol.ne,basis_set,argnum=[0],name='test_alpha')
-            optimization(Mol.mol,Mol.ne,basis_set,readguess=True,argnum=[0],name='test_alpha')
-            optimization(Mol.mol,Mol.ne,basis_set,argnum=[2],readguess=True,name='test_xyz_guess')
-            optimization(Mol.mol,Mol.ne,basis_set,argnum=[0,2],readguess=True,name='test_xyz_alpha_guess')
+            manager = Tasks(mol,
+                     name='../testfiles/%s'%(Mol.mol_name),      ## Prefix for all optput files
+                     verbose=False)          ## If there is going to be an output
+            manager.runtask('Opt',
+                     max_scf=50,
+                     max_steps = 5,
+                     print_coef=False,
+                     argnum=[2],
+                     output=False)
+
             print ('    Testing '+Mol.mol_name+'...done')
         print ('Testing Optimization'+'...done')
         pass

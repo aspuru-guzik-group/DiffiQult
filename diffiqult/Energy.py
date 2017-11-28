@@ -75,44 +75,43 @@ def newdensity(F,Sinv,nbasis,ne):
 def rhfenergy(alpha_old,coef2,xyz,l,charges,xyz_atom,natoms,nbasis,contr_list,ne,max_scf,max_d,log,eigen,printguess,readguess,name,write,dtype):
     '''
     This function returns the rhf function
-    Parameters
-    ------------
-    alpha_old : array
+
+    Parameters:
+     alpha_old : array
                 Gaussian exponents
-    coef2     : array
+     coef2     : array
                 Contraction coeffients
-    xyz       : array 3N
+     xyz       : array 3N
                 Gaussian centers
-    l         : array 3N
+     l         : array 3N
                 Angular momentum each entry is a vector
                 eg. s orbital (0,0,0) or pz (1,0,0)
-    charges   : array
+     charges   : array
                 Atom charges
-    nbasis    : int
+     nbasis    : int
                 Number of basis
-    contr_list: list of integers
+     contr_list: list of integers
                 Specify the number of orbitals in each atom
-    ne        : int
+     ne        : int
                 Number of electrons
-    max_scf   : int
+     max_scf   : int
                 maximum number of scf cycles
-    log       : bool
+     log       : bool
                 The exponents are given in log
-    printguess: str or None
+     printguess: str or None
                 File to print coeff matrix initial guess
-    readguess : str or None
+     readguess : str or None
                 File that contains coeff matrix initial guess
-    name      : str
+     name      : str
                 Output file name
-    write     : bool
+     write     : bool
                 True if printing
-    dtype     : type of output
+     dtype     : type of output
                 This is the directive to know if algopy will be used or not
                 np.float64(1.0) if it is a single point calculation
                 otherwise, it specify the size of the UTMP, autodifferentiation
-    Returns
-    _______
-    energy    : float
+    Returns:
+       energy    : float
                 RHF energy
     '''
     tool_D = 1e-8

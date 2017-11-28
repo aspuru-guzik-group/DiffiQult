@@ -1,5 +1,5 @@
 ''' This module was taken from scipy and modified to optimize
-several parameters at a time with the BFGS Minimization '''
+several parameters at a time with the BFGS Minimization.'''
 from __future__ import division, print_function, absolute_import
 
 
@@ -448,29 +448,29 @@ def _approx_fprime_helper(xk, f, epsilon, args=(), f0=None):
 
 def algopy_wrapper(function):
     """Returnfunction to obtain the gradient of the function
-    Parameters
-    ----------
-    f : callable
+
+    Parameters:
+      f : callable
         The function of which to determine the gradient (partial derivatives).
         Should take `xk` as first argument, other arguments to `f` can be
         supplied in ``*args``.  Should return a scalar, the value of the
         function at `xk`.
-    Returns
-    -------
-    grad_function : function
+
+    Returns:
+       grad_function : function
         The partial derivatives of `f` to `xk`.
 
     """
     from algopy import UTPM
     def algopy_fprime(xk, *args):
         """ Evaluates the gradient of the function 
-        Parameters
-        ----------
-        xk : array_like
+        Parameters:
+
+         xk : array_like
              The coordinate vector at which to determine the gradient of `f`.
-        Returns
-        -------
-        grad : ndarray
+
+        Returns:
+          grad : ndarray
               The partial derivatives of `f` to `xk`.
         """
         var = UTPM.init_jacobian(xk)
@@ -631,71 +631,66 @@ def fmin_bfgs(f, x0, fprime=None, args=(), argnum=None, gtol=1e-5, norm=Inf,
     '''
     Minimize a function using the BFGS algorithm.
 
-    Parameters
-    ----------
-    f : callable f(x,*args)
+    Parameters:
+     f : callable f(x,*args)
         Objective function to be minimized.
-    x0 : ndarray
+     x0 : ndarray
         Initial guess.
-    fprime : callable f'(x,*args), optional
+     fprime : callable f'(x,*args), optional
         Gradient of f.
-    args : tuple, optional
+     args : tuple, optional
         Extra arguments passed to f and fprime.
-    gtol : float, optional
+     gtol : float, optional
         Gradient norm must be less than gtol before successful termination.
-    norm : float, optional
+     norm : float, optional
         Order of norm (Inf is max, -Inf is min)
-    epsilon : int or ndarray, optional
+     epsilon : int or ndarray, optional
         If fprime is approximated, use this value for the step size.
-    callback : callable, optional
+     callback : callable, optional
         An optional user-supplied function to call after each
         iteration.  Called as callback(xk), where xk is the
         current parameter vector.
-    maxiter : int, optional
+     maxiter : int, optional
         Maximum number of iterations to perform.
-    full_output : bool, optional
+     full_output : bool, optional
         If True,return fopt, func_calls, grad_calls, and warnflag
         in addition to xopt.
-    disp : bool, optional
+     disp : bool, optional
         Print convergence message if True.
-    retall : bool, optional
-        Return a list of results at each iteration if True.
+     retall : bool, optional
+         Return a list of results at each iteration if True.
 
-    Returns
-    -------
-    xopt : ndarray
+    Returns:
+      xopt : ndarray
         Parameters which minimize f, i.e. f(xopt) == fopt.
-    fopt : float
+      fopt : float
         Minimum value.
-    gopt : ndarray
+      gopt : ndarray
         Value of gradient at minimum, f'(xopt), which should be near 0.
-    Bopt : ndarray
+      Bopt : ndarray
         Value of 1/f''(xopt), i.e. the inverse hessian matrix.
-    func_calls : int
+      func_calls : int
         Number of function_calls made.
-    grad_calls : int
+      grad_calls : int
         Number of gradient calls made.
-    warnflag : integer
+      warnflag : integer
         1 : Maximum number of iterations exceeded.
         2 : Gradient and/or function calls not changing.
-    allvecs  :  list
+      allvecs  :  list
         `OptimizeResult` at each iteration.  Only returned if retall is True.
 
-    See also
-    --------
-    minimize: Interface to minimization algorithms for multivariate
-        functions. See the 'BFGS' `method` in particular.
 
-    Notes
-    -----
+    Notes:
+
     Optimize the function, f, whose gradient is given by fprime
     using the quasi-Newton method of Broyden, Fletcher, Goldfarb,
     and Shanno (BFGS)
 
-    References
-    ----------
+    References:
+
     Wright, and Nocedal 'Numerical Optimization', 1999, pg. 198.
-    This function was originally taken and modified from scipy
+
+    This function was originally taken and modified from scipy.
     '''
     opts = { 'norm': norm,
             'eps': epsilon,
@@ -703,7 +698,7 @@ def fmin_bfgs(f, x0, fprime=None, args=(), argnum=None, gtol=1e-5, norm=Inf,
             'maxiter': maxiter,
             'return_all': retall}
 
-    res = _minimize_bfgs(f, x0, args, argnum, fprime, callback=callback,gtol=gtol, **opts)
+    res = minimize_bfgs(f, x0, args, argnum, fprime, callback=callback,gtol=gtol, **opts)
 
     if full_output:
         retlist = (res['x'], res['fun'], res['jac'], res['hess_inv'],
@@ -718,34 +713,40 @@ def fmin_bfgs(f, x0, fprime=None, args=(), argnum=None, gtol=1e-5, norm=Inf,
             return res['x']
 
 
-def _minimize_bfgs(fun, x0, args=(), argnum=None, jac=None, callback=None, name=None,
+def minimize_bfgs(fun, x0, args=(), argnum=None, jac=None, callback=None, name=None,
                    gtol=1e-1, etol=1e-5, norm=Inf, eps=_epsilon, maxiter=30,
                    disp=False, return_all=False,xtol_linew=1e-14,verbose=1,print_out=False,
                    **unknown_options):
-    """
+    '''
     Minimization of scalar function of one or more variables using the
     BFGS algorithm.
 
-    Options
-    -------
-    disp : bool
+     Parameters:
+        fun: function
+           The objective function to minimize.
+        x0: array
+           The initial parameter to optimize.
+
+    Options:
+
+     disp : bool
         Set to True to print convergence messages.
-    maxiter : int
+     maxiter : int
         Maximum number of iterations to perform.
-    gtol : float
+     gtol : float
         Gradient norm must be less than `gtol` before successful
         termination
-    norm : float
+     norm : float
         Order of norm (Inf is max, -Inf is min).
-    eps : float or ndarray
+     eps : float or ndarray
         If `jac` is approximated, use this value for the step size.
-    etol : float
+     etol : float
         Difference between steps for succesful termination.
-    verbose : bool
+     verbose : bool
         Set true print steps values and gradients on screen.
-    print_out: bool
+     print_out: bool
         Set True to print molden files of each optimization step. 
-    """
+    '''
     _check_unknown_options(unknown_options)
     f = fun
     fprimes = jac

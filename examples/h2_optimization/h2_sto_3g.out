@@ -1,0 +1,42 @@
+ *************************************************
+ DiffiQult Ago 2017
+ Author: Teresa Tamayo Mendoza 
+ *************************************************
+
+ Starting at Tue Nov 28 15:51:07 2017
+ -------------------------------------------------------- 
+ Task: Opt 
+
+ Outputfiles prefix: h2_sto_3g-task-1 
+ Optimization ...
+ ---Start--- 
+ Initial parameters 
+ Maximum number of SCF: 50
+ Default SCF tolerance: 0.000000
+ Initial density matrix: None
+ Maximum number of optimization steps: (FIX ME)30
+ Tolerance in jac infinity norm (Hardcoded): 0.100000 
+ Tolerance in energy (Hardcoded): 0.000010 
+ Atomic coordinates
+  H 1 1 0.0 0.0 0.20165898
+  H 2 1 0.0 0.0 -1.64601435
+ Basis functions
+  1 0.000000 0.000000 0.201659 s 3.425251 0 0 0
+  2 0.000000 0.000000 -1.646014 s 0.623914 0 0 0
+
+ ---End--- 
+ Time 776.2576150 :
+ Message: Optimization terminated successfully.
+ Current energy: -1.095971
+ Current gradient  0.000008 
+ Number of iterations 26 
+ Atomic coordinates
+  H 1 1 0.0 0.0 0.20165898
+  H 2 1 0.0 0.0 -1.64601435
+ Basis functions
+  1 0.000000 0.000000 0.201659 s 4.803590 0 0 0
+  2 0.000000 0.000000 -1.646014 s 0.694786 0 0 0
+
+ Finishing at Tue Nov 28 16:04:12 2017 
+ *************************************************
+
