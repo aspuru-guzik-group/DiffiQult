@@ -1,5 +1,5 @@
 DiffiQult
-===========
+=========
 
 *DiffiQult* is an open source autodifferentiable Quantum Chemistry package, that optimized RHF energies of small molecules with
 respect of the parameters a given intial the basis function. 
@@ -12,10 +12,10 @@ respect of the parameters a given intial the basis function.
 It generates energy gradients with automatic differentiation tools.
 
 Getting started with DiffiQult
-===============
+==============================
 
 Requirements
-______________________________
+____________
 
 * Numpy
 
@@ -29,7 +29,7 @@ ______________________________
 * Python 2.7 (so far). 
 
 Installation
-______________________________
+____________
 
 * From source:
 
@@ -39,10 +39,10 @@ ______________________________
 
 
 Usage
-======================
+=====
 
 Molecular system 
-------------------
+-----------------
 
 We define the molecular systems by creating an object of the class  ``System_mol``, where we specify the
 molecular geometry in atomic units, basis sets and number of electrons, optionally we can 
@@ -65,7 +65,7 @@ specify a tag. For example:
                          mol_name='agua')                    ## Units -> Bohr
 
 Tasks
-------------------
+-----
 
 The jobs in *Diffiqult* are managed by an Tasks object.
 For example, if we want to obtain a file with the results.
@@ -112,7 +112,7 @@ with the information of the geometry, basis and MO.
 * The geometry and MOs can be vizualized with *molden*,and the molden file.
 
 Optimization
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 
 To optimize one or many input parameters, we use the option ```Opt` ``,
