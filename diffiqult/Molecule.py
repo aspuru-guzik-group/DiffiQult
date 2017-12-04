@@ -2,21 +2,22 @@ import numpy as np
 from Data import select_atom
 
 
-class Getbasis:
+class Getbasis():
     '''
-    This class loads the basis function for a given molecule
+    This class loads the basis function for a given molecule,
+
     Attributes:
      alpha : array
-           Gaussian withds
+           Gaussian withds.
      coef : array
-          Contraction coefficients
+          Contraction coefficients.
      xyz : array
-          Gaussian centers
+          Gaussian centers.
      list_contr : list
-          List of integers with contractions, 
+          List of integers with contractions.
           eg. [3,3] are two AO with three primitives each
      l      : list of tuples 
-           List of tuple of integers with angular momentums
+           List of tuple of integers with angular momentums.
            eg. [(0,0,0),(0,1,0)] one s orbital and one p_x
     '''
     def __init__(self,molecule,basis,shifted=False):
@@ -83,17 +84,21 @@ class Getbasis:
        return angular[l]
 
 
-class Getgeom:
+class Getgeom():
     '''
     This class loads the geometry in xyz coordinates
-       Parameters:
+
+    '''
+    def __init__(self,molecule):
+      '''
+      Parameters:
          molecule : list
                  It contains spects of geometry
                  [( atomic_number_atom_1,(x,y,z), 
                     atomic_number_atom_1,(x,y,z),
                     atomic_number_atom_1,(x,y,z)]
-    '''
-    def __init__(self,molecule):
+       
+       '''
        self.xyz = []   # coordinates of atoms
        self.charge = []   # coordinates of atoms
        for atom in molecule:
@@ -107,8 +112,7 @@ class System_mol():
     This class contains all the information of the system
     extracted from mol and basis
 
-    Parameters:
-
+    Attributes:
      alpha : array
            Gaussian withds
      coef : array
