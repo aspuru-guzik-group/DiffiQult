@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Code Documentation &mdash; DiffiQulT 0.1 documentation</title>
+  <title>Code Documentation &mdash; DiffiQult 0.1 documentation</title>
   
 
   
@@ -26,7 +26,7 @@
 
   
   
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
   
 
   
@@ -35,11 +35,12 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="DiffiQulT 0.1 documentation" href="index.html"/>
+    <link rel="top" title="DiffiQult 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Current features" href="todo.html"/>
         <link rel="prev" title="DiffiQult" href="intro.html"/> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -55,7 +56,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> DiffiQulT
+            <a href="index.html" class="icon icon-home"> DiffiQult
           
 
           
@@ -89,7 +90,11 @@
 <li class="toctree-l3"><a class="reference internal" href="intro.html#installation">Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="intro.html#molecular-system">Molecular system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="intro.html#tasks">Tasks</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Code Documentation</a><ul>
@@ -99,6 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#diffiqult-optimize">diffiqult.Optimize</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="todo.html">Current features</a></li>
 </ul>
 
             
@@ -113,7 +119,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">DiffiQulT</a>
+          <a href="index.html">DiffiQult</a>
         
       </nav>
 
@@ -149,7 +155,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/diffiqult.rst.txt" rel="nofollow"> View page source</a>
+            <a href="sources/diffiqult.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -168,7 +174,7 @@
 <span id="diffiqult-task"></span><h2>diffiqult.Task<a class="headerlink" href="#module-diffiqult.Task" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="diffiqult.Task.Tasks">
-<em class="property">class </em><code class="descclassname">diffiqult.Task.</code><code class="descname">Tasks</code><span class="sig-paren">(</span><em>mol</em>, <em>name</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">diffiqult.Task.</code><code class="descname">Tasks</code><span class="sig-paren">(</span><em>mol</em>, <em>name</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Task.html#Tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class manage the implemented tasks over a system included
 in DiffiQult.</p>
 <p>Attributes:</p>
@@ -190,7 +196,7 @@ in DiffiQult.</p>
 </div></blockquote>
 <dl class="method">
 <dt id="diffiqult.Task.Tasks.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>mol</em>, <em>name</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mol</em>, <em>name</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Task.html#Tasks.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize task object that contains the inital parameters.</p>
 <p>Parameters:</p>
 <blockquote>
@@ -219,7 +225,7 @@ in DiffiQult.</p>
 
 <dl class="method">
 <dt id="diffiqult.Task.Tasks.energy">
-<code class="descname">energy</code><span class="sig-paren">(</span><em>max_scf=30</em>, <em>max_d=300</em>, <em>printguess=None</em>, <em>output=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.energy" title="Permalink to this definition">¶</a></dt>
+<code class="descname">energy</code><span class="sig-paren">(</span><em>max_scf=30</em>, <em>max_d=300</em>, <em>printguess=None</em>, <em>output=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Task.html#Tasks.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function handdles the single point calculations</p>
 <p>Options:</p>
 <dl class="docutils">
@@ -236,7 +242,7 @@ in DiffiQult.</p>
 
 <dl class="method">
 <dt id="diffiqult.Task.Tasks.optimization">
-<code class="descname">optimization</code><span class="sig-paren">(</span><em>max_scf=100, log=True, scf=True, name='Output', readguess=None, output=False, argnum=[0], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.optimization" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimization</code><span class="sig-paren">(</span><em>max_scf=100, log=True, scf=True, name='Output', readguess=None, output=False, argnum=[0], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Task.html#Tasks.optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.optimization" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function handdles the optimization procedure</p>
 <p>Options:</p>
 <dl class="docutils">
@@ -262,7 +268,7 @@ in DiffiQult.</p>
 
 <dl class="method">
 <dt id="diffiqult.Task.Tasks.runtask">
-<code class="descname">runtask</code><span class="sig-paren">(</span><em>task</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Task.html#Tasks.runtask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.runtask" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runtask</code><span class="sig-paren">(</span><em>task</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Task.html#Tasks.runtask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Task.Tasks.runtask" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method run a given task and if it has success, it uptates system with the most recent energy value and basis function</p>
 <p>Parameters:</p>
 <blockquote>
@@ -295,7 +301,7 @@ in DiffiQult.</p>
 <span id="diffiqult-molecule"></span><h2>diffiqult.Molecule<a class="headerlink" href="#module-diffiqult.Molecule" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="diffiqult.Molecule.Getbasis">
-<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">Getbasis</code><span class="sig-paren">(</span><em>molecule</em>, <em>basis</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#Getbasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getbasis" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">Getbasis</code><span class="sig-paren">(</span><em>molecule</em>, <em>basis</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Molecule.html#Getbasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getbasis" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class loads the basis function for a given molecule
 Attributes:</p>
 <blockquote>
@@ -316,7 +322,7 @@ eg. [(0,0,0),(0,1,0)] one s orbital and one p_x</dd>
 </div></blockquote>
 <dl class="method">
 <dt id="diffiqult.Molecule.Getbasis.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>molecule</em>, <em>basis</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#Getbasis.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getbasis.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>molecule</em>, <em>basis</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Molecule.html#Getbasis.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getbasis.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Parameters:</dt>
 <dd><dl class="first last docutils">
@@ -367,7 +373,7 @@ atomic_number_atom_1,(x,y,z)]</div></blockquote>
 
 <dl class="class">
 <dt id="diffiqult.Molecule.Getgeom">
-<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">Getgeom</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#Getgeom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getgeom" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">Getgeom</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Molecule.html#Getgeom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.Getgeom" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>This class loads the geometry in xyz coordinates</dt>
 <dd><dl class="first last docutils">
@@ -389,7 +395,7 @@ atomic_number_atom_1,(x,y,z)]</div></blockquote>
 
 <dl class="class">
 <dt id="diffiqult.Molecule.System_mol">
-<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">System_mol</code><span class="sig-paren">(</span><em>mol</em>, <em>basis_set</em>, <em>ne</em>, <em>mol_name='molecule'</em>, <em>angs=False</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#System_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">diffiqult.Molecule.</code><code class="descname">System_mol</code><span class="sig-paren">(</span><em>mol</em>, <em>basis_set</em>, <em>ne</em>, <em>mol_name='molecule'</em>, <em>angs=False</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Molecule.html#System_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class contains all the information of the system
 extracted from mol and basis</p>
 <p>Parameters:</p>
@@ -411,7 +417,7 @@ eg. [(0,0,0),(0,1,0)] one s orbital and one p_x</dd>
 </div></blockquote>
 <dl class="method">
 <dt id="diffiqult.Molecule.System_mol.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>mol</em>, <em>basis_set</em>, <em>ne</em>, <em>mol_name='molecule'</em>, <em>angs=False</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#System_mol.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mol</em>, <em>basis_set</em>, <em>ne</em>, <em>mol_name='molecule'</em>, <em>angs=False</em>, <em>shifted=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Molecule.html#System_mol.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function starts an object System_mol</p>
 <dl class="docutils">
 <dt>Parameters:</dt>
@@ -470,7 +476,7 @@ atomic_number_atom_1,(x,y,z)]</dd>
 
 <dl class="method">
 <dt id="diffiqult.Molecule.System_mol.printcurrentgeombasis">
-<code class="descname">printcurrentgeombasis</code><span class="sig-paren">(</span><em>tape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Molecule.html#System_mol.printcurrentgeombasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol.printcurrentgeombasis" title="Permalink to this definition">¶</a></dt>
+<code class="descname">printcurrentgeombasis</code><span class="sig-paren">(</span><em>tape</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Molecule.html#System_mol.printcurrentgeombasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Molecule.System_mol.printcurrentgeombasis" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method prints the current values of sys on tape
 Parameters:</p>
 <blockquote>
@@ -488,7 +494,7 @@ Parameters:</p>
 <span id="diffiqult-energy"></span><h2>diffiqult.Energy<a class="headerlink" href="#module-diffiqult.Energy" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="diffiqult.Energy.rhfenergy">
-<code class="descclassname">diffiqult.Energy.</code><code class="descname">rhfenergy</code><span class="sig-paren">(</span><em>alpha_old</em>, <em>coef2</em>, <em>xyz</em>, <em>l</em>, <em>charges</em>, <em>xyz_atom</em>, <em>natoms</em>, <em>nbasis</em>, <em>contr_list</em>, <em>ne</em>, <em>max_scf</em>, <em>max_d</em>, <em>log</em>, <em>eigen</em>, <em>printguess</em>, <em>readguess</em>, <em>name</em>, <em>write</em>, <em>dtype</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Energy.html#rhfenergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Energy.rhfenergy" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">diffiqult.Energy.</code><code class="descname">rhfenergy</code><span class="sig-paren">(</span><em>alpha_old</em>, <em>coef2</em>, <em>xyz</em>, <em>l</em>, <em>charges</em>, <em>xyz_atom</em>, <em>natoms</em>, <em>nbasis</em>, <em>contr_list</em>, <em>ne</em>, <em>max_scf</em>, <em>max_d</em>, <em>log</em>, <em>eigen</em>, <em>printguess</em>, <em>readguess</em>, <em>name</em>, <em>write</em>, <em>dtype</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Energy.html#rhfenergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Energy.rhfenergy" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns the rhf function</p>
 <dl class="docutils">
 <dt>Parameters:</dt>
@@ -545,7 +551,7 @@ otherwise, it specify the size of the UTMP, autodifferentiation</dd>
 several parameters at a time with the BFGS Minimization</p>
 <dl class="function">
 <dt id="diffiqult.Optimize.algopy_wrapper">
-<code class="descclassname">diffiqult.Optimize.</code><code class="descname">algopy_wrapper</code><span class="sig-paren">(</span><em>function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Optimize.html#algopy_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Optimize.algopy_wrapper" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">diffiqult.Optimize.</code><code class="descname">algopy_wrapper</code><span class="sig-paren">(</span><em>function</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Optimize.html#algopy_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Optimize.algopy_wrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returnfunction to obtain the gradient of the function
 Parameters
 ———-
@@ -563,7 +569,7 @@ function at <cite>xk</cite>.</div></blockquote>
 
 <dl class="function">
 <dt id="diffiqult.Optimize.fmin_bfgs">
-<code class="descclassname">diffiqult.Optimize.</code><code class="descname">fmin_bfgs</code><span class="sig-paren">(</span><em>f</em>, <em>x0</em>, <em>fprime=None</em>, <em>args=()</em>, <em>argnum=None</em>, <em>gtol=1e-05</em>, <em>norm=inf</em>, <em>epsilon=1.4901161193847656e-08</em>, <em>maxiter=None</em>, <em>full_output=0</em>, <em>disp=1</em>, <em>retall=0</em>, <em>callback=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diffiqult/Optimize.html#fmin_bfgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Optimize.fmin_bfgs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">diffiqult.Optimize.</code><code class="descname">fmin_bfgs</code><span class="sig-paren">(</span><em>f</em>, <em>x0</em>, <em>fprime=None</em>, <em>args=()</em>, <em>argnum=None</em>, <em>gtol=1e-05</em>, <em>norm=inf</em>, <em>epsilon=1.4901161193847656e-08</em>, <em>maxiter=None</em>, <em>full_output=0</em>, <em>disp=1</em>, <em>retall=0</em>, <em>callback=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/diffiqult/Optimize.html#fmin_bfgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#diffiqult.Optimize.fmin_bfgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Minimize a function using the BFGS algorithm.</p>
 <dl class="docutils">
 <dt>f <span class="classifier-delimiter">:</span> <span class="classifier">callable f(x,*args)</span></dt>
@@ -637,6 +643,8 @@ This function was originally taken and modified from scipy</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="todo.html" class="btn btn-neutral float-right" title="Current features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
       
         <a href="intro.html" class="btn btn-neutral" title="DiffiQult" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
@@ -676,16 +684,16 @@ This function was originally taken and modified from scipy</p>
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
   
   
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="static/js/theme.js"></script>
   
 
   

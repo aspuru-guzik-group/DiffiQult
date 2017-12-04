@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>DiffiQult &mdash; DiffiQulT 0.1 documentation</title>
+  <title>DiffiQult &mdash; DiffiQult 0.1 documentation</title>
   
 
   
@@ -26,7 +26,7 @@
 
   
   
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
   
 
   
@@ -35,12 +35,12 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="DiffiQulT 0.1 documentation" href="index.html"/>
+    <link rel="top" title="DiffiQult 0.1 documentation" href="index.html"/>
         <link rel="next" title="Code Documentation" href="diffiqult.html"/>
-        <link rel="prev" title="Welcome to the docs" href="index.html"/> 
+        <link rel="prev" title="Welcome to the DiffiQult documenation" href="index.html"/> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -56,7 +56,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> DiffiQulT
+            <a href="index.html" class="icon icon-home"> DiffiQult
           
 
           
@@ -90,7 +90,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#molecular-system">Molecular system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tasks">Tasks</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diffiqult.html">Code Documentation</a><ul>
@@ -115,7 +119,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">DiffiQulT</a>
+          <a href="index.html">DiffiQult</a>
         
       </nav>
 
@@ -151,7 +155,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+            <a href="sources/intro.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -165,13 +169,21 @@
            <div itemprop="articleBody">
             
   <div class="section" id="diffiqult">
-<h1>DiffiQult<a class="headerlink" href="#diffiqult" title="Permalink to this headline">¶</a></h1>
-<p><em>DiffiQult</em> is an open source autodifferentiable Quantum Chemistry package, that optimized RHF energies of small molecules with
-respect of the parameters a given intial the basis function.</p>
+<span id="intro"></span><h1>DiffiQult<a class="headerlink" href="#diffiqult" title="Permalink to this headline">¶</a></h1>
+<p><em>DiffiQult</em> is an open source autodifferentiable quantum chemistry package.</p>
 <div class="figure">
-<img alt="_images/h2o_3g_MO_1.gif" src="_images/h2o_3g_MO_1.gif" />
+<img alt="images/h2o_3g_MO_1.gif" src="images/h2o_3g_MO_1.gif" />
 </div>
-<p>It generates energy gradients with automatic differentiation tools.</p>
+<p>Method:</p>
+<ul class="simple">
+<li>RHF</li>
+</ul>
+<p>Features:</p>
+<ul class="simple">
+<li>Single point calculations</li>
+<li>Energy gradients with respect to any parameter of the one-particle basis functions.</li>
+<li>Energy optimization with respect of any parameter of the Gaussian basis functions.</li>
+</ul>
 <div class="section" id="getting-started-with-diffiqult">
 <h2>Getting started with DiffiQult<a class="headerlink" href="#getting-started-with-diffiqult" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="requirements">
@@ -192,7 +204,7 @@ respect of the parameters a given intial the basis function.</p>
 </dd>
 </dl>
 </li>
-<li><p class="first">Python 2.7 (so far).</p>
+<li><p class="first">Python 2.7 (so far tested).</p>
 </li>
 </ul>
 </div>
@@ -205,19 +217,20 @@ respect of the parameters a given intial the basis function.</p>
 <p><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></p>
 </div></blockquote>
 </li>
-<li><p class="first">From pip:</p>
-<blockquote>
-<div><p><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">diffiqult</span></code></p>
-</div></blockquote>
-</li>
 </ul>
 </div>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>We define the molecular systems by creating an object of the class  <code class="docutils literal"><span class="pre">System_mol</span></code>, where we specify the
-molecular geometry in atomic units, basis sets and number of electrons, optionally we can
-specify a tag. For example:</p>
+<div class="section" id="molecular-system">
+<h3>Molecular system<a class="headerlink" href="#molecular-system" title="Permalink to this headline">¶</a></h3>
+<p>We define the parameters of a molecular systems with an <code class="docutils literal"><span class="pre">System_mol</span></code> object:</p>
+<ul class="simple">
+<li>molecular geometry in xyz format and atomic units</li>
+<li>basis sets (data base so far sto_3G</li>
+<li>number of electrons</li>
+</ul>
+<p>For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Basis set is sto_3G</span>
 <span class="kn">from</span> <span class="nn">diffiqult.Basis</span> <span class="kn">import</span> <span class="n">basis_set_3G_STO</span> <span class="k">as</span> <span class="n">basis</span>
    <span class="c1"># Our molecule H_2</span>
@@ -233,17 +246,23 @@ specify a tag. For example:</p>
                        <span class="n">mol_name</span><span class="o">=</span><span class="s1">&#39;agua&#39;</span><span class="p">)</span>                    <span class="c1">## Units -&gt; Bohr</span>
 </pre></div>
 </div>
-<p>The jobs in <em>Diffiqult</em> are managed by an Tasks object.
-For example, if we want to obtain a file with the results.</p>
-<p>For example:</p>
-<p>where we define the molecular system to
-optimize with <code class="docutils literal"><span class="pre">system</span></code> and output options with <code class="docutils literal"><span class="pre">verbose</span></code>.</p>
-<p>The method <code class="docutils literal"><span class="pre">Tasks.runtask</span></code> computes one the following tasks:</p>
+</div>
+<div class="section" id="tasks">
+<h3>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h3>
+<p>The jobs in <em>Diffiqult</em> are managed by a <code class="docutils literal"><span class="pre">Tasks</span></code> object,</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">manager</span> <span class="o">=</span> <span class="n">Tasks</span><span class="p">(</span><span class="n">system</span><span class="p">,</span>
+             <span class="n">name</span><span class="o">=</span><span class="s1">&#39;h2_sto_3g&#39;</span><span class="p">,</span>      <span class="c1">## Prefix for all optput files</span>
+             <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>          <span class="c1">## If there is going to be an output</span>
+</pre></div>
+</div>
+<p>where we defined the molecular system to
+optimize with the object <code class="docutils literal"><span class="pre">system</span></code>, and output options with <code class="docutils literal"><span class="pre">verbose</span></code>.</p>
+<p>The class <code class="docutils literal"><span class="pre">Task</span></code> contains the method <code class="docutils literal"><span class="pre">Tasks.runtask</span></code>, it computes one the following options:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="22%" />
+<col width="21%" />
 <col width="14%" />
-<col width="64%" />
+<col width="65%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Task</th>
@@ -254,37 +273,41 @@ optimize with <code class="docutils literal"><span class="pre">system</span></co
 <tbody valign="top">
 <tr class="row-even"><td>Single point energies</td>
 <td><code class="docutils literal"><span class="pre">Energy</span></code></td>
-<td>Calculate the RHF energy and update it in an attibute in system</td>
+<td>It calculates the RHF energy and updates some attibute in system</td>
 </tr>
 <tr class="row-odd"><td>Optimization</td>
 <td><code class="docutils literal"><span class="pre">Opt</span></code></td>
-<td>Optimize a given parameter and update the basis set in system</td>
+<td>It optimizes a given parameter and updates the basis set in system</td>
 </tr>
 </tbody>
 </table>
-<p>To calculate the RHF of a molecule we use the option <code class="docutils literal"><span class="pre">`Energy`</span></code>, optionally we can produce a molden file
-with the information of the geometry, basis and MO.</p>
+<div class="section" id="single-point-calculation">
+<h4>Single point calculation<a class="headerlink" href="#single-point-calculation" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">manager</span><span class="o">.</span><span class="n">runtask</span><span class="p">(</span><span class="s1">&#39;Energy&#39;</span><span class="p">,</span>
              <span class="n">max_scf</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>                        <span class="c1"># Maximum number of SCF cycles</span>
              <span class="n">printcoef</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>                    <span class="c1"># This will produce a npy file with the molecular coefficients</span>
-             <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Output.molden&#39;</span><span class="p">,</span>              <span class="c1"># Name of the output</span>
+             <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Output.molden&#39;</span><span class="p">,</span>              <span class="c1"># Name of the output file (Compatible with molden)</span>
              <span class="n">output</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Notes:</strong></p>
 <ul class="simple">
-<li>We currently don’t have convergence options for the SCF  .</li>
+<li>We currently don’t have convergence options for the SCF.</li>
 <li>The molden file also contains an input section that can be used as input for system with the option <code class="docutils literal"><span class="pre">shifted</span></code></li>
 <li>The geometry and MOs can be vizualized with <em>molden</em>,and the molden file.</li>
 </ul>
-<p>To optimize one or many input parameters, we use the option <a href="#id1"><span class="problematic" id="id2">``</span></a><cite>Opt</cite> <a href="#id3"><span class="problematic" id="id4">``</span></a>,
-it updates the attributes of the molecular system object.</p>
-<p>For example:</p>
+</div>
+<div class="section" id="optimization">
+<h4>Optimization<a class="headerlink" href="#optimization" title="Permalink to this headline">¶</a></h4>
+<p>To optimize one or many input parameters, we use the option <code class="docutils literal"><span class="pre">Opt</span></code>. After a succesful optimization or
+If the optimization reaches the maximum number of steps or convergence, it updates
+the attributes of the <code class="docutils literal"><span class="pre">system_mol</span></code> object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">manager</span><span class="o">.</span><span class="n">runtask</span><span class="p">(</span><span class="s1">&#39;Opt&#39;</span><span class="p">,</span>
                  <span class="n">max_scf</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                  <span class="n">printcoef</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">argnum</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>  <span class="c1"># Optimization of centers</span>
                  <span class="n">output</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># We optimized all the steps</span>
+<span class="k">print</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="n">syste</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>where <code class="docutils literal"><span class="pre">argnum</span></code> recieves a list with the parameters to optimize with the following convention:</p>
@@ -310,7 +333,7 @@ it updates the attributes of the molecular system object.</p>
 </tr>
 </tbody>
 </table>
-<p>For example, we can optimize the atomic centered basis function with respect of their widths and contraction
+<p>for example, we can optimize the atomic centered basis function with respect of their widths and contraction
 coefficients in the following way.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">manager</span><span class="o">.</span><span class="n">runtask</span><span class="p">(</span><span class="s1">&#39;Opt&#39;</span><span class="p">,</span>
                     <span class="n">max_scf</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
@@ -318,6 +341,9 @@ coefficients in the following way.</p>
                     <span class="n">argnum</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># Optimization of centers</span>
                     <span class="n">output</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>   <span class="c1"># We print a molden file of all steps</span>
 </pre></div>
+</div>
+<p>Additionally, if <code class="docutils literal"><span class="pre">output</span></code> is set to <code class="docutils literal"><span class="pre">True</span></code>, a molden file of each optimization step is printed.</p>
+</div>
 </div>
 </div>
 </div>
@@ -335,7 +361,7 @@ coefficients in the following way.</p>
         <a href="diffiqult.html" class="btn btn-neutral float-right" title="Code Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Welcome to the docs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="Welcome to the DiffiQult documenation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -373,16 +399,16 @@ coefficients in the following way.</p>
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
   
   
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="static/js/theme.js"></script>
   
 
   

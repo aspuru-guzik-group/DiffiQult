@@ -1,16 +1,26 @@
+.. _intro:
+
 DiffiQult
 ===========
 
-*DiffiQult* is an open source autodifferentiable Quantum Chemistry package, that optimized RHF energies of small molecules with
-respect of the parameters a given intial the basis function. 
+*DiffiQult* is an open source autodifferentiable quantum chemistry package.
+
 
 .. only:: html
 
    .. figure:: h2o_3g_MO_1.gif
 
+Method:
 
-It generates energy gradients with automatic differentiation tools.
+* RHF 
 
+Features:
+
+* Single point calculations
+* Energy gradients with respect to any parameter of the one-particle basis functions.
+* Energy optimization with respect of any parameter of the Gaussian basis functions.
+
+===============
 Getting started with DiffiQult
 ===============
 
@@ -26,7 +36,7 @@ ______________________________
 
 		``pip install algopy``
 
-* Python 2.7 (so far). 
+* Python 2.7 (so far tested). 
 
 Installation
 ______________________________
@@ -38,15 +48,21 @@ ______________________________
      ``python setup.py install``
 
 
+===============
 Usage
-======================
+===============
+
 
 Molecular system 
-------------------
+______________________________
 
-We define the molecular systems by creating an object of the class  ``System_mol``, where we specify the
-molecular geometry in atomic units, basis sets and number of electrons, optionally we can 
-specify a tag. For example:
+We define the parameters of a molecular systems with an ``System_mol`` object:
+
+* molecular geometry in xyz format and atomic units
+* basis sets (data base so far sto_3G
+* number of electrons
+
+For example:
 
 .. code-block:: python
 
@@ -65,60 +81,54 @@ specify a tag. For example:
                          mol_name='agua')                    ## Units -> Bohr
 
 Tasks
-------------------
+______________________________
 
-The jobs in *Diffiqult* are managed by an Tasks object.
-For example, if we want to obtain a file with the results.
+The jobs in *Diffiqult* are managed by a ``Tasks`` object,
 
-For example:
 
 .. code-block:: python
+
    manager = Tasks(system,
                 name='h2_sto_3g',      ## Prefix for all optput files
                 verbose=True)          ## If there is going to be an output
-where we define the molecular system to 
-optimize with ``system`` and output options with ``verbose``. 
 
-The method ``Tasks.runtask`` computes one the following tasks: 
+where we defined the molecular system to 
+optimize with the object ``system``, and output options with ``verbose``. 
 
-+----------------------+--------------+-----------------------------------------------------------------+
-| Task                 | Key          | Description                                                     |
-+======================+==============+=================================================================+
-| Single point energies| ``Energy``   | Calculate the RHF energy and update it in an attibute in system |
-+----------------------+--------------+-----------------------------------------------------------------+
-| Optimization         | ``Opt``      |   Optimize a given parameter and update the basis set in system |
-+----------------------+--------------+-----------------------------------------------------------------+
+The class ``Task`` contains the method ``Tasks.runtask``, it computes one the following options: 
+
++----------------------+--------------+-------------------------------------------------------------------+
+| Task                 | Key          | Description                                                       |
++======================+==============+===================================================================+
+| Single point energies| ``Energy``   | It calculates the RHF energy and updates some attibute in system  |
++----------------------+--------------+-------------------------------------------------------------------+
+| Optimization         | ``Opt``      | It optimizes a given parameter and updates the basis set in system|
++----------------------+--------------+-------------------------------------------------------------------+
 
 
 Single point calculation
-~~~~~~~~~~~~~~~~~~~~~~
-
-
-To calculate the RHF of a molecule we use the option ```Energy```, optionally we can produce a molden file 
-with the information of the geometry, basis and MO.
+`````````````
 
 .. code-block:: python
 
         manager.runtask('Energy',
                      max_scf=50,                        # Maximum number of SCF cycles
                      printcoef=True,                    # This will produce a npy file with the molecular coefficients
-                     name='Output.molden',              # Name of the output
+                     name='Output.molden',              # Name of the output file (Compatible with molden)
                      output=True)
 
 **Notes:** 
 
-* We currently don't have convergence options for the SCF  .
+* We currently don't have convergence options for the SCF.
 * The molden file also contains an input section that can be used as input for system with the option ``shifted``
 * The geometry and MOs can be vizualized with *molden*,and the molden file.
 
 Optimization
-~~~~~~~~~~~~~~~~~~~~~~
+`````````````
 
-
-To optimize one or many input parameters, we use the option ```Opt` ``,
-it updates the attributes of the molecular system object.
-
-For example:
+To optimize one or many input parameters, we use the option ``Opt``. After a succesful optimization or
+If the optimization reaches the maximum number of steps or convergence, it updates
+the attributes of the ``system_mol`` object.
 
 .. code-block:: python
 
@@ -127,6 +137,7 @@ For example:
                      printcoef=False,
                      argnum=[2],  # Optimization of centers
                      output=True) # We optimized all the steps
+    print(manager.syste.energy)
 
 where ``argnum`` recieves a list with the parameters to optimize with the following convention:
 
@@ -140,8 +151,9 @@ where ``argnum`` recieves a list with the parameters to optimize with the follow
 | Gaussian centers         |  2         |
 +--------------------------+------------+
 
-For example, we can optimize the atomic centered basis function with respect of their widths and contraction
+for example, we can optimize the atomic centered basis function with respect of their widths and contraction
 coefficients in the following way.
+
 
 .. code-block:: python
 
@@ -151,3 +163,4 @@ coefficients in the following way.
                      argnum=[0,1],  # Optimization of centers
                      output=True)   # We print a molden file of all steps
 
+Additionally, if ``output`` is set to ``True``, a molden file of each optimization step is printed.
