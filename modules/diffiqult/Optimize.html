@@ -1,0 +1,1258 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>diffiqult.Optimize &mdash; DiffiQult 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="DiffiQult 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> DiffiQult
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">DiffiQult</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html#getting-started-with-diffiqult">Getting started with DiffiQult</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#molecular-system">Molecular system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../intro.html#tasks">Tasks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../diffiqult.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Task">diffiqult.Task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Molecule">diffiqult.Molecule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#module-diffiqult.Energy">diffiqult.Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diffiqult.html#diffiqult-optimize">diffiqult.Optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../todo.html">Current features</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DiffiQult</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>diffiqult.Optimize</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for diffiqult.Optimize</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39; This module was taken from scipy and modified to optimize</span>
+<span class="sd">several parameters at a time with the BFGS Minimization &#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+
+<span class="c1"># Minimization routines</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fmin&#39;</span><span class="p">,</span> <span class="s1">&#39;fmin_powell&#39;</span><span class="p">,</span> <span class="s1">&#39;fmin_bfgs&#39;</span><span class="p">,</span> <span class="s1">&#39;fmin_ncg&#39;</span><span class="p">,</span> <span class="s1">&#39;fmin_cg&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;fminbound&#39;</span><span class="p">,</span> <span class="s1">&#39;brent&#39;</span><span class="p">,</span> <span class="s1">&#39;golden&#39;</span><span class="p">,</span> <span class="s1">&#39;bracket&#39;</span><span class="p">,</span> <span class="s1">&#39;rosen&#39;</span><span class="p">,</span> <span class="s1">&#39;rosen_der&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;rosen_hess&#39;</span><span class="p">,</span> <span class="s1">&#39;rosen_hess_prod&#39;</span><span class="p">,</span> <span class="s1">&#39;brute&#39;</span><span class="p">,</span> <span class="s1">&#39;approx_fprime&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;line_search&#39;</span><span class="p">,</span> <span class="s1">&#39;check_grad&#39;</span><span class="p">,</span> <span class="s1">&#39;OptimizeResult&#39;</span><span class="p">,</span> <span class="s1">&#39;show_options&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;OptimizeWarning&#39;</span><span class="p">]</span>
+
+<span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;restructuredtext en&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">scipy._lib.six</span> <span class="k">import</span> <span class="n">callable</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="p">(</span><span class="n">atleast_1d</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">mgrid</span><span class="p">,</span> <span class="n">argmin</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">squeeze</span><span class="p">,</span>
+                   <span class="n">vectorize</span><span class="p">,</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">Inf</span><span class="p">,</span> <span class="n">asfarray</span><span class="p">,</span> <span class="n">isinf</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">diffiqult.Linesearch</span> <span class="k">import</span> <span class="p">(</span><span class="n">line_search_wolfe1</span><span class="p">,</span> <span class="n">line_search_wolfe2</span><span class="p">,</span>
+                         <span class="n">line_search_wolfe2</span> <span class="k">as</span> <span class="n">line_search</span><span class="p">,</span>
+                         <span class="n">LineSearchWarning</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">scipy._lib._util</span> <span class="k">import</span> <span class="n">getargspec_no_self</span> <span class="k">as</span> <span class="n">_getargspec</span>
+
+
+<span class="c1"># standard status messages of optimizers</span>
+<span class="n">_status_message</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;success&#39;</span><span class="p">:</span> <span class="s1">&#39;Optimization terminated successfully.&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum number of function evaluations has &#39;</span>
+                              <span class="s1">&#39;been exceeded.&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum number of iterations has been &#39;</span>
+                              <span class="s1">&#39;exceeded.&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;pr_loss&#39;</span><span class="p">:</span> <span class="s1">&#39;Desired error not necessarily achieved due &#39;</span>
+                              <span class="s1">&#39;to precision loss.&#39;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">MemoizeJac</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Decorator that caches the value gradient of function each time it</span>
+<span class="sd">    is called. &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">fun</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jac</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">fg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jac</span> <span class="o">=</span> <span class="n">fg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">fg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">derivative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">alltrue</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac</span>
+
+
+<span class="k">class</span> <span class="nc">OptimizeResult</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents the optimization result.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : ndarray</span>
+<span class="sd">        The solution of the optimization.</span>
+<span class="sd">    success : bool</span>
+<span class="sd">        Whether or not the optimizer exited successfully.</span>
+<span class="sd">    status : int</span>
+<span class="sd">        Termination status of the optimizer. Its value depends on the</span>
+<span class="sd">        underlying solver. Refer to `message` for details.</span>
+<span class="sd">    message : str</span>
+<span class="sd">        Description of the cause of the termination.</span>
+<span class="sd">    fun, jac, hess: ndarray</span>
+<span class="sd">        Values of objective function, its Jacobian and its Hessian (if</span>
+<span class="sd">        available). The Hessians may be approximations, see the documentation</span>
+<span class="sd">        of the function in question.</span>
+<span class="sd">    hess_inv : object</span>
+<span class="sd">        Inverse of the objective function&#39;s Hessian; may be an approximation.</span>
+<span class="sd">        Not available for all solvers. The type of this attribute may be</span>
+<span class="sd">        either np.ndarray or scipy.sparse.linalg.LinearOperator.</span>
+<span class="sd">    nfev, njev, nhev : int</span>
+<span class="sd">        Number of evaluations of the objective functions and of its</span>
+<span class="sd">        Jacobian and Hessian.</span>
+<span class="sd">    nit : int</span>
+<span class="sd">        Number of iterations performed by the optimizer.</span>
+<span class="sd">    maxcv : float</span>
+<span class="sd">        The maximum constraint violation.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    There may be additional attributes not listed above depending of the</span>
+<span class="sd">    specific solver. Since this class is essentially a subclass of dict</span>
+<span class="sd">    with attribute accessors, one can see which attributes are available</span>
+<span class="sd">    using the `keys()` method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="fm">__setattr__</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span>
+    <span class="fm">__delattr__</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__delitem__</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                              <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">())])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">OptimizeWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">_check_unknown_options</span><span class="p">(</span><span class="n">unknown_options</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">unknown_options</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">unknown_options</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="c1"># Stack level 4: this is called from _minimize_*, which is</span>
+        <span class="c1"># called from another function in Scipy. Level 4 is the first</span>
+        <span class="c1"># level in user code.</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Unknown solver options: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">,</span> <span class="n">OptimizeWarning</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">is_array_scalar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test whether `x` is either a scalar or an array scalar.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+<span class="n">_epsilon</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">vecnorm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">ord</span> <span class="o">==</span> <span class="n">Inf</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">ord</span> <span class="o">==</span> <span class="o">-</span><span class="n">Inf</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="nb">ord</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="nb">ord</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">rosen</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Rosenbrock function.</span>
+
+<span class="sd">    The function computed is::</span>
+
+<span class="sd">        sum(100.0*(x[1:] - x[:-1]**2.0)**2.0 + (1 - x[:-1])**2.0</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        1-D array of points at which the Rosenbrock function is to be computed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    f : float</span>
+<span class="sd">        The value of the Rosenbrock function.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    rosen_der, rosen_hess, rosen_hess_prod</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mf">100.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mf">2.0</span><span class="p">,</span>
+                  <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span>
+
+
+<span class="k">def</span> <span class="nf">rosen_der</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The derivative (i.e. gradient) of the Rosenbrock function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        1-D array of points at which the derivative is to be computed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rosen_der : (N,) ndarray</span>
+<span class="sd">        The gradient of the Rosenbrock function at `x`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    rosen, rosen_hess, rosen_hess_prod</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">xm</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">xm_m1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">xm_p1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">der</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">200</span> <span class="o">*</span> <span class="p">(</span><span class="n">xm</span> <span class="o">-</span> <span class="n">xm_m1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span>
+                 <span class="mi">400</span> <span class="o">*</span> <span class="p">(</span><span class="n">xm_p1</span> <span class="o">-</span> <span class="n">xm</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">xm</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">xm</span><span class="p">))</span>
+    <span class="n">der</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">der</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">200</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">der</span>
+
+
+<span class="k">def</span> <span class="nf">rosen_hess</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Hessian matrix of the Rosenbrock function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        1-D array of points at which the Hessian matrix is to be computed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rosen_hess : ndarray</span>
+<span class="sd">        The Hessian matrix of the Rosenbrock function at `x`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    rosen, rosen_der, rosen_hess_prod</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">diagonal</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">diagonal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1200</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">diagonal</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">diagonal</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">202</span> <span class="o">+</span> <span class="mi">1200</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">H</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">diagonal</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">H</span>
+
+
+<span class="k">def</span> <span class="nf">rosen_hess_prod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Product of the Hessian matrix of the Rosenbrock function with a vector.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        1-D array of points at which the Hessian matrix is to be computed.</span>
+<span class="sd">    p : array_like</span>
+<span class="sd">        1-D array, the vector to be multiplied by the Hessian matrix.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rosen_hess_prod : ndarray</span>
+<span class="sd">        The Hessian matrix of the Rosenbrock function at `x` multiplied</span>
+<span class="sd">        by the vector `p`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    rosen, rosen_der, rosen_hess</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">Hp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">Hp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1200</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">Hp</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">p</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span>
+                <span class="p">(</span><span class="mi">202</span> <span class="o">+</span> <span class="mi">1200</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span>
+                <span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="n">Hp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">400</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">200</span><span class="o">*</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Hp</span>
+
+
+<span class="k">def</span> <span class="nf">wrap_function</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">argnum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This function returns the value of a function evaluated in args&#39;&#39;&#39;</span>
+    <span class="c1">### This is for counting the ncalls</span>
+    <span class="n">ncalls</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ncalls</span><span class="p">,</span> <span class="kc">None</span>
+    
+    <span class="k">def</span> <span class="nf">function_wrapper</span><span class="p">(</span><span class="n">wrapper_args</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">ncalls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">argnum</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args1</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">wrapper_args</span><span class="p">])</span><span class="o">+</span><span class="n">args</span>
+            <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">args1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">split</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">vec</span><span class="p">:</span>
+               <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+                   <span class="n">num</span> <span class="o">*=</span> <span class="n">j</span>
+               <span class="n">split</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">wrapper_args</span><span class="p">,</span><span class="n">split</span><span class="p">)</span>
+            <span class="n">args1</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">argnum</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+               <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">argnum</span><span class="p">:</span>
+                  <span class="n">args1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">argnum</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)],</span><span class="n">vec</span><span class="p">[</span><span class="n">j</span><span class="p">])))</span>
+                  <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+               <span class="k">else</span><span class="p">:</span>
+                  <span class="n">args1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+                  <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">print_out</span><span class="p">:</span>
+               <span class="n">args1</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">args1</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1">## Activate flag for printint in autochem</span>
+               <span class="n">args1</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">args1</span><span class="p">)</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span> <span class="c1">## Give the root for naming outputs.</span>
+            <span class="n">args1</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args1</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">args1</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">value</span> <span class="c1">#np.transpose(value)</span>
+    <span class="k">return</span> <span class="n">ncalls</span><span class="p">,</span> <span class="n">function_wrapper</span>
+
+<span class="k">def</span> <span class="nf">wrap_functions</span><span class="p">(</span><span class="n">fprimes</span><span class="p">,</span><span class="n">args</span><span class="p">,</span><span class="n">argnum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">vec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This function returns the value of a set of functions evaluated in args</span>
+<span class="sd">    at this point it is used just for frimes&#39;&#39;&#39;</span>
+    <span class="n">ncalls</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">grad_calls</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">myfprime</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">fprime</span> <span class="ow">in</span> <span class="n">fprimes</span><span class="p">:</span>
+          <span class="n">g_c</span><span class="p">,</span> <span class="n">myfp</span> <span class="o">=</span> <span class="n">wrap_function</span><span class="p">(</span><span class="n">fprime</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span><span class="n">argnum</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vec</span><span class="o">=</span><span class="n">vec</span><span class="p">)</span>
+          <span class="n">grad_calls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g_c</span><span class="p">)</span>
+          <span class="n">myfprime</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myfp</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="n">wrap_function</span><span class="p">(</span><span class="n">fprimes</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">argnum</span><span class="p">,</span> <span class="n">vec</span><span class="o">=</span><span class="n">vec</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">gradients</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+       <span class="n">ncalls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+       <span class="n">grad</span> <span class="o">=</span> <span class="p">[]</span>
+       <span class="k">for</span> <span class="n">function</span> <span class="ow">in</span> <span class="n">myfprime</span><span class="p">:</span>
+           <span class="n">grad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+       <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">):</span> 
+          <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">grad</span><span class="p">,(</span><span class="nb">len</span><span class="p">(</span><span class="n">grad</span><span class="p">[</span><span class="mi">0</span><span class="p">]),))</span>
+       <span class="nb">print</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+       <span class="n">grad</span><span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+       <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">grad</span><span class="p">,(</span><span class="n">grad</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+    <span class="k">return</span> <span class="n">ncalls</span><span class="p">,</span><span class="n">gradients</span>
+
+<span class="k">def</span> <span class="nf">fmin</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+         <span class="n">full_output</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">retall</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimize a function using the downhill simplex algorithm.</span>
+
+<span class="sd">    This algorithm only uses function values, not derivatives or second</span>
+<span class="sd">    derivatives.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : callable func(x,*args)</span>
+<span class="sd">        The objective function to be minimized.</span>
+<span class="sd">    x0 : ndarray</span>
+<span class="sd">        Initial guess.</span>
+<span class="sd">    args : tuple, optional</span>
+<span class="sd">        Extra arguments passed to func, i.e. ``f(x,*args)``.</span>
+<span class="sd">    callback : callable, optional</span>
+<span class="sd">        Called after each iteration, as callback(xk), where xk is the</span>
+<span class="sd">        current parameter vector.</span>
+<span class="sd">    xtol : float, optional</span>
+<span class="sd">        Relative error in xopt acceptable for convergence.</span>
+<span class="sd">    ftol : number, optional</span>
+<span class="sd">        Relative error in func(xopt) acceptable for convergence.</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations to perform.</span>
+<span class="sd">    maxfun : number, optional</span>
+<span class="sd">        Maximum number of function evaluations to make.</span>
+<span class="sd">    full_output : bool, optional</span>
+<span class="sd">        Set to True if fopt and warnflag outputs are desired.</span>
+<span class="sd">    disp : bool, optional</span>
+<span class="sd">        Set to True to print convergence messages.</span>
+<span class="sd">    retall : bool, optional</span>
+<span class="sd">        Set to True to return list of solutions at each iteration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xopt : ndarray</span>
+<span class="sd">        Parameter that minimizes function.</span>
+<span class="sd">    fopt : float</span>
+<span class="sd">        Value of function at minimum: ``fopt = func(xopt)``.</span>
+<span class="sd">    iter : int</span>
+<span class="sd">        Number of iterations performed.</span>
+<span class="sd">    funcalls : int</span>
+<span class="sd">        Number of function calls made.</span>
+<span class="sd">    warnflag : int</span>
+<span class="sd">        1 : Maximum number of function evaluations made.</span>
+<span class="sd">        2 : Maximum number of iterations reached.</span>
+<span class="sd">    allvecs : list</span>
+<span class="sd">        Solution at each iteration.</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    minimize: Interface to minimization algorithms for multivariate</span>
+<span class="sd">        functions. See the &#39;Nelder-Mead&#39; `method` in particular.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses a Nelder-Mead simplex algorithm to find the minimum of function of</span>
+<span class="sd">    one or more variables.</span>
+
+<span class="sd">    This algorithm has a long history of successful use in applications.</span>
+<span class="sd">    But it will usually be slower than an algorithm that uses first or</span>
+<span class="sd">    second derivative information. In practice it can have poor</span>
+<span class="sd">    performance in high-dimensional problems and is not robust to</span>
+<span class="sd">    minimizing complicated functions. Additionally, there currently is no</span>
+<span class="sd">    complete theory describing when the algorithm will successfully</span>
+<span class="sd">    converge to the minimum, or how fast it will if it does.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Nelder, J.A. and Mead, R. (1965), &quot;A simplex method for function</span>
+<span class="sd">           minimization&quot;, The Computer Journal, 7, pp. 308-313</span>
+
+<span class="sd">    .. [2] Wright, M.H. (1996), &quot;Direct Search Methods: Once Scorned, Now</span>
+<span class="sd">           Respectable&quot;, in Numerical Analysis 1995, Proceedings of the</span>
+<span class="sd">           1995 Dundee Biennial Conference in Numerical Analysis, D.F.</span>
+<span class="sd">           Griffiths and G.A. Watson (Eds.), Addison Wesley Longman,</span>
+<span class="sd">           Harlow, UK, pp. 191-208.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;xtol&#39;</span><span class="p">:</span> <span class="n">xtol</span><span class="p">,</span>
+            <span class="s1">&#39;ftol&#39;</span><span class="p">:</span> <span class="n">ftol</span><span class="p">,</span>
+            <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="n">maxiter</span><span class="p">,</span>
+            <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="n">maxfun</span><span class="p">,</span>
+            <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="n">disp</span><span class="p">,</span>
+            <span class="s1">&#39;return_all&#39;</span><span class="p">:</span> <span class="n">retall</span><span class="p">}</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_minimize_neldermead</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">full_output</span><span class="p">:</span>
+        <span class="n">retlist</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;fun&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;nit&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;nfev&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">retall</span><span class="p">:</span>
+            <span class="n">retlist</span> <span class="o">+=</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;allvecs&#39;</span><span class="p">],</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">retlist</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">retall</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;allvecs&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+
+
+
+<span class="k">def</span> <span class="nf">_approx_fprime_helper</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">f0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See ``approx_fprime``.  An optional initial function value arg is added.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">f0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">xk</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">))</span>
+    <span class="n">grad</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xk</span><span class="p">),),</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">ei</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xk</span><span class="p">),),</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xk</span><span class="p">)):</span>
+        <span class="n">ei</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">ei</span>
+        <span class="n">grad</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">xk</span> <span class="o">+</span> <span class="n">d</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">))</span> <span class="o">-</span> <span class="n">f0</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">ei</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">grad</span>
+
+<div class="viewcode-block" id="algopy_wrapper"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Optimize.algopy_wrapper">[docs]</a><span class="k">def</span> <span class="nf">algopy_wrapper</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returnfunction to obtain the gradient of the function</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : callable</span>
+<span class="sd">        The function of which to determine the gradient (partial derivatives).</span>
+<span class="sd">        Should take `xk` as first argument, other arguments to `f` can be</span>
+<span class="sd">        supplied in ``*args``.  Should return a scalar, the value of the</span>
+<span class="sd">        function at `xk`.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    grad_function : function</span>
+<span class="sd">        The partial derivatives of `f` to `xk`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">algopy</span> <span class="k">import</span> <span class="n">UTPM</span>
+    <span class="k">def</span> <span class="nf">algopy_fprime</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Evaluates the gradient of the function </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xk : array_like</span>
+<span class="sd">             The coordinate vector at which to determine the gradient of `f`.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grad : ndarray</span>
+<span class="sd">              The partial derivatives of `f` to `xk`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="n">UTPM</span><span class="o">.</span><span class="n">init_jacobian</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+        <span class="n">grad</span> <span class="o">=</span> <span class="n">UTPM</span><span class="o">.</span><span class="n">extract_jacobian</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="n">var</span><span class="p">])</span><span class="o">+</span><span class="n">args</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">grad</span>
+    <span class="k">return</span> <span class="n">algopy_fprime</span></div>
+
+<span class="k">def</span> <span class="nf">approx_fprime</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finite-difference approximation of the gradient of a scalar function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xk : array_like</span>
+<span class="sd">        The coordinate vector at which to determine the gradient of `f`.</span>
+<span class="sd">    f : callable</span>
+<span class="sd">        The function of which to determine the gradient (partial derivatives).</span>
+<span class="sd">        Should take `xk` as first argument, other arguments to `f` can be</span>
+<span class="sd">        supplied in ``*args``.  Should return a scalar, the value of the</span>
+<span class="sd">        function at `xk`.</span>
+<span class="sd">    epsilon : array_like</span>
+<span class="sd">        Increment to `xk` to use for determining the function gradient.</span>
+<span class="sd">        If a scalar, uses the same finite difference delta for all partial</span>
+<span class="sd">        derivatives.  If an array, should contain one value per element of</span>
+<span class="sd">        `xk`.</span>
+<span class="sd">    \*args : args, optional</span>
+<span class="sd">        Any other arguments that are to be passed to `f`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    grad : ndarray</span>
+<span class="sd">        The partial derivatives of `f` to `xk`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    check_grad : Check correctness of gradient function against approx_fprime.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The function gradient is determined by the forward finite difference</span>
+<span class="sd">    formula::</span>
+
+<span class="sd">                 f(xk[i] + epsilon[i]) - f(xk[i])</span>
+<span class="sd">        f&#39;[i] = ---------------------------------</span>
+<span class="sd">                            epsilon[i]</span>
+
+<span class="sd">    The main use of `approx_fprime` is in scalar function optimizers like</span>
+<span class="sd">    `fmin_bfgs`, to determine numerically the Jacobian of a function.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from scipy import optimize</span>
+<span class="sd">    &gt;&gt;&gt; def func(x, c0, c1):</span>
+<span class="sd">    ...     &quot;Coordinate vector `x` should be an array of size two.&quot;</span>
+<span class="sd">    ...     return c0 * x[0]**2 + c1*x[1]**2</span>
+
+<span class="sd">    &gt;&gt;&gt; x = np.ones(2)</span>
+<span class="sd">    &gt;&gt;&gt; c0, c1 = (1, 200)</span>
+<span class="sd">    &gt;&gt;&gt; eps = np.sqrt(np.finfo(float).eps)</span>
+<span class="sd">    &gt;&gt;&gt; optimize.approx_fprime(x, func, [eps, np.sqrt(200) * eps], c0, c1)</span>
+<span class="sd">    array([   2.        ,  400.00004198])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_approx_fprime_helper</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_grad</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check the correctness of a gradient function by comparing it against a</span>
+<span class="sd">    (forward) finite-difference approximation of the gradient.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : callable ``func(x0, *args)``</span>
+<span class="sd">        Function whose derivative is to be checked.</span>
+<span class="sd">    grad : callable ``grad(x0, *args)``</span>
+<span class="sd">        Gradient of `func`.</span>
+<span class="sd">    x0 : ndarray</span>
+<span class="sd">        Points to check `grad` against forward difference approximation of grad</span>
+<span class="sd">        using `func`.</span>
+<span class="sd">    args : \*args, optional</span>
+<span class="sd">        Extra arguments passed to `func` and `grad`.</span>
+<span class="sd">    epsilon : float, optional</span>
+<span class="sd">        Step size used for the finite difference approximation. It defaults to</span>
+<span class="sd">        ``sqrt(numpy.finfo(float).eps)``, which is approximately 1.49e-08.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    err : float</span>
+<span class="sd">        The square root of the sum of squares (i.e. the 2-norm) of the</span>
+<span class="sd">        difference between ``grad(x0, *args)`` and the finite difference</span>
+<span class="sd">        approximation of `grad` using func at the points `x0`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    approx_fprime</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; def func(x):</span>
+<span class="sd">    ...     return x[0]**2 - 0.5 * x[1]**3</span>
+<span class="sd">    &gt;&gt;&gt; def grad(x):</span>
+<span class="sd">    ...     return [2 * x[0], -1.5 * x[1]**2]</span>
+<span class="sd">    &gt;&gt;&gt; from scipy.optimize import check_grad</span>
+<span class="sd">    &gt;&gt;&gt; check_grad(func, grad, [1.5, -1.5])</span>
+<span class="sd">    2.9802322387695312e-08</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;epsilon&#39;</span><span class="p">,</span> <span class="n">_epsilon</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown keyword arguments: </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()),))</span>
+    <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">((</span><span class="n">grad</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-</span>
+                     <span class="n">approx_fprime</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">approx_fhess_p</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">fprime</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">x0</span> <span class="o">+</span> <span class="n">epsilon</span><span class="o">*</span><span class="n">p</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">))</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">fprime</span><span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">x0</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">f2</span> <span class="o">-</span> <span class="n">f1</span><span class="p">)</span> <span class="o">/</span> <span class="n">epsilon</span>
+
+
+<span class="k">class</span> <span class="nc">_LineSearchError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">_line_search_wolfe12</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fprime</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="p">,</span> <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Same as line_search_wolfe1, but fall back to line_search_wolfe2 if</span>
+<span class="sd">    suitable step length is not found, and raise an exception if a</span>
+<span class="sd">    suitable step length is not found.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    _LineSearchError</span>
+<span class="sd">        If no suitable step size is found</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">line_search_wolfe1</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fprime</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">,</span>
+                             <span class="n">old_fval</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="p">,</span> <span class="n">xtol</span><span class="o">=</span><span class="n">xtol</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># line search failed: try different one.</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">LineSearchWarning</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">line_search_wolfe2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fprime</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">,</span> 
+                                     <span class="n">old_fval</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="p">,</span><span class="n">xtol</span><span class="o">=</span><span class="n">xtol</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">_LineSearchError</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<div class="viewcode-block" id="fmin_bfgs"><a class="viewcode-back" href="../../diffiqult.html#diffiqult.Optimize.fmin_bfgs">[docs]</a><span class="k">def</span> <span class="nf">fmin_bfgs</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">fprime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">argnum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">Inf</span><span class="p">,</span>
+              <span class="n">epsilon</span><span class="o">=</span><span class="n">_epsilon</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">retall</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Minimize a function using the BFGS algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : callable f(x,*args)</span>
+<span class="sd">        Objective function to be minimized.</span>
+<span class="sd">    x0 : ndarray</span>
+<span class="sd">        Initial guess.</span>
+<span class="sd">    fprime : callable f&#39;(x,*args), optional</span>
+<span class="sd">        Gradient of f.</span>
+<span class="sd">    args : tuple, optional</span>
+<span class="sd">        Extra arguments passed to f and fprime.</span>
+<span class="sd">    gtol : float, optional</span>
+<span class="sd">        Gradient norm must be less than gtol before successful termination.</span>
+<span class="sd">    norm : float, optional</span>
+<span class="sd">        Order of norm (Inf is max, -Inf is min)</span>
+<span class="sd">    epsilon : int or ndarray, optional</span>
+<span class="sd">        If fprime is approximated, use this value for the step size.</span>
+<span class="sd">    callback : callable, optional</span>
+<span class="sd">        An optional user-supplied function to call after each</span>
+<span class="sd">        iteration.  Called as callback(xk), where xk is the</span>
+<span class="sd">        current parameter vector.</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations to perform.</span>
+<span class="sd">    full_output : bool, optional</span>
+<span class="sd">        If True,return fopt, func_calls, grad_calls, and warnflag</span>
+<span class="sd">        in addition to xopt.</span>
+<span class="sd">    disp : bool, optional</span>
+<span class="sd">        Print convergence message if True.</span>
+<span class="sd">    retall : bool, optional</span>
+<span class="sd">        Return a list of results at each iteration if True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xopt : ndarray</span>
+<span class="sd">        Parameters which minimize f, i.e. f(xopt) == fopt.</span>
+<span class="sd">    fopt : float</span>
+<span class="sd">        Minimum value.</span>
+<span class="sd">    gopt : ndarray</span>
+<span class="sd">        Value of gradient at minimum, f&#39;(xopt), which should be near 0.</span>
+<span class="sd">    Bopt : ndarray</span>
+<span class="sd">        Value of 1/f&#39;&#39;(xopt), i.e. the inverse hessian matrix.</span>
+<span class="sd">    func_calls : int</span>
+<span class="sd">        Number of function_calls made.</span>
+<span class="sd">    grad_calls : int</span>
+<span class="sd">        Number of gradient calls made.</span>
+<span class="sd">    warnflag : integer</span>
+<span class="sd">        1 : Maximum number of iterations exceeded.</span>
+<span class="sd">        2 : Gradient and/or function calls not changing.</span>
+<span class="sd">    allvecs  :  list</span>
+<span class="sd">        `OptimizeResult` at each iteration.  Only returned if retall is True.</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    minimize: Interface to minimization algorithms for multivariate</span>
+<span class="sd">        functions. See the &#39;BFGS&#39; `method` in particular.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Optimize the function, f, whose gradient is given by fprime</span>
+<span class="sd">    using the quasi-Newton method of Broyden, Fletcher, Goldfarb,</span>
+<span class="sd">    and Shanno (BFGS)</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Wright, and Nocedal &#39;Numerical Optimization&#39;, 1999, pg. 198.</span>
+<span class="sd">    This function was originally taken and modified from scipy</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="n">norm</span><span class="p">,</span>
+            <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="n">epsilon</span><span class="p">,</span>
+            <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="n">disp</span><span class="p">,</span>
+            <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="n">maxiter</span><span class="p">,</span>
+            <span class="s1">&#39;return_all&#39;</span><span class="p">:</span> <span class="n">retall</span><span class="p">}</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_minimize_bfgs</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">argnum</span><span class="p">,</span> <span class="n">fprime</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span><span class="n">gtol</span><span class="o">=</span><span class="n">gtol</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">full_output</span><span class="p">:</span>
+        <span class="n">retlist</span> <span class="o">=</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;fun&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;jac&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;hess_inv&#39;</span><span class="p">],</span>
+                   <span class="n">res</span><span class="p">[</span><span class="s1">&#39;nfev&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;njev&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">retall</span><span class="p">:</span>
+            <span class="n">retlist</span> <span class="o">+=</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;allvecs&#39;</span><span class="p">],</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">retlist</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">retall</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;allvecs&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_minimize_bfgs</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">argnum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">Inf</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">_epsilon</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                   <span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">xtol_linew</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">unknown_options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimization of scalar function of one or more variables using the</span>
+<span class="sd">    BFGS algorithm.</span>
+
+<span class="sd">    Options</span>
+<span class="sd">    -------</span>
+<span class="sd">    disp : bool</span>
+<span class="sd">        Set to True to print convergence messages.</span>
+<span class="sd">    maxiter : int</span>
+<span class="sd">        Maximum number of iterations to perform.</span>
+<span class="sd">    gtol : float</span>
+<span class="sd">        Gradient norm must be less than `gtol` before successful</span>
+<span class="sd">        termination</span>
+<span class="sd">    norm : float</span>
+<span class="sd">        Order of norm (Inf is max, -Inf is min).</span>
+<span class="sd">    eps : float or ndarray</span>
+<span class="sd">        If `jac` is approximated, use this value for the step size.</span>
+<span class="sd">    etol : float</span>
+<span class="sd">        Difference between steps for succesful termination.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        Set true print steps values and gradients on screen.</span>
+<span class="sd">    print_out: bool</span>
+<span class="sd">        Set True to print molden files of each optimization step. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_unknown_options</span><span class="p">(</span><span class="n">unknown_options</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">fun</span>
+    <span class="n">fprimes</span> <span class="o">=</span> <span class="n">jac</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">eps</span>
+    <span class="n">retall</span> <span class="o">=</span> <span class="n">return_all</span>
+
+    <span class="n">vec</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x0</span><span class="p">:</span>
+       <span class="n">vec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">asarray</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x0</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">x0</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x0</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+    <span class="k">if</span> <span class="n">maxiter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">maxiter</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">200</span>
+               
+    <span class="n">func_calls</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">wrap_function</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span><span class="n">argnum</span><span class="p">,</span> <span class="n">vec</span><span class="o">=</span><span class="n">vec</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fprimes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+       <span class="c1">### numerical derivative</span>
+       <span class="n">grad_calls</span><span class="p">,</span> <span class="n">myfprime</span> <span class="o">=</span> <span class="n">wrap_function</span><span class="p">(</span><span class="n">approx_fprime</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">))</span>
+       <span class="nb">print</span><span class="p">(</span><span class="n">myfprime</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="n">grad_calls</span><span class="p">,</span> <span class="n">myfprime</span> <span class="o">=</span> <span class="n">wrap_functions</span><span class="p">(</span><span class="n">fprimes</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span><span class="n">argnum</span><span class="p">,</span> <span class="n">vec</span><span class="o">=</span><span class="n">vec</span><span class="p">)</span>
+
+    
+    <span class="n">val</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span> 
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">Hk</span> <span class="o">=</span> <span class="n">I</span>
+    <span class="n">xk</span> <span class="o">=</span> <span class="n">x0</span>
+    <span class="k">if</span> <span class="n">retall</span><span class="p">:</span>
+        <span class="n">allvecs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x0</span><span class="p">]</span>
+    <span class="n">sk</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">gtol</span><span class="p">]</span>
+    <span class="n">warnflag</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">old_fval</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="n">print_out</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-BFGS_step_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+    <span class="n">gfk</span> <span class="o">=</span> <span class="n">myfprime</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="n">old_old_fval</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Checking convergence with gradient criteria</span>
+    <span class="n">gnorm</span> <span class="o">=</span> <span class="n">vecnorm</span><span class="p">(</span><span class="n">gfk</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">gnorm</span> <span class="o">&gt;</span> <span class="n">gtol</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">&lt;</span> <span class="n">maxiter</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+           <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;STEP: &#39;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">)</span>
+           <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;x: &#39;</span><span class="p">,</span><span class="n">xk</span><span class="p">)</span>
+           <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;gfk: &#39;</span><span class="p">,</span><span class="n">gfk</span><span class="p">)</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Hk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">alpha_k</span><span class="p">,</span> <span class="n">fc</span><span class="p">,</span> <span class="n">gc</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="p">,</span> <span class="n">gfkp1</span> <span class="o">=</span> \
+                     <span class="n">_line_search_wolfe12</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">myfprime</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gfk</span><span class="p">,</span>
+                                          <span class="n">old_fval</span><span class="p">,</span> <span class="n">old_old_fval</span><span class="p">,</span> <span class="n">xtol</span><span class="o">=</span><span class="n">xtol_linew</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_LineSearchError</span><span class="p">:</span>
+            <span class="n">warnflag</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">break</span>
+
+
+        <span class="n">xkp1</span> <span class="o">=</span> <span class="n">xk</span> <span class="o">+</span> <span class="n">alpha_k</span> <span class="o">*</span> <span class="n">pk</span>
+        <span class="k">if</span> <span class="n">retall</span><span class="p">:</span>
+            <span class="n">allvecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xkp1</span><span class="p">)</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="n">xkp1</span> <span class="o">-</span> <span class="n">xk</span>
+        <span class="n">xk</span> <span class="o">=</span> <span class="n">xkp1</span>
+        <span class="k">if</span> <span class="n">gfkp1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gfkp1</span> <span class="o">=</span> <span class="n">myfprime</span><span class="p">(</span><span class="n">xkp1</span><span class="p">)</span>
+
+        <span class="n">yk</span> <span class="o">=</span> <span class="n">gfkp1</span> <span class="o">-</span> <span class="n">gfk</span>
+        <span class="n">gfk</span> <span class="o">=</span> <span class="n">gfkp1</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">gnorm</span> <span class="o">=</span> <span class="n">vecnorm</span><span class="p">(</span><span class="n">gfk</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">gnorm</span> <span class="o">&lt;=</span> <span class="n">gtol</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">val</span><span class="o">-</span><span class="n">old_fval</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">etol</span><span class="p">):</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">old_fval</span><span class="p">):</span>
+            <span class="c1"># We correctly found +-Inf as optimal value, or something went</span>
+            <span class="c1"># wrong.</span>
+            <span class="n">warnflag</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">break</span>
+
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># this was handled in numeric, let it remaines for more safety</span>
+            <span class="n">rhok</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">yk</span><span class="p">,</span> <span class="n">sk</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="n">rhok</span> <span class="o">=</span> <span class="mf">1000.0</span>
+            <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Divide-by-zero encountered: rhok assumed large&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isinf</span><span class="p">(</span><span class="n">rhok</span><span class="p">):</span>  <span class="c1"># this is patch for numpy</span>
+            <span class="n">rhok</span> <span class="o">=</span> <span class="mf">1000.0</span>
+            <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Divide-by-zero encountered: rhok assumed large&quot;</span><span class="p">)</span>
+        <span class="n">A1</span> <span class="o">=</span> <span class="n">I</span> <span class="o">-</span> <span class="n">sk</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">yk</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">rhok</span>
+        <span class="n">A2</span> <span class="o">=</span> <span class="n">I</span> <span class="o">-</span> <span class="n">yk</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">rhok</span>
+        <span class="n">Hk</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Hk</span><span class="p">,</span> <span class="n">A2</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">rhok</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span>
+                                                 <span class="n">sk</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">if</span> <span class="n">print_out</span><span class="p">:</span>
+           <span class="c1"># An extra evaluation for printing molden file</span>
+           <span class="n">old_fval</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="n">print_out</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-BFGS_step_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+  
+    <span class="n">fval</span> <span class="o">=</span> <span class="n">old_fval</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Last step: &#39;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span> <span class="n">old_fval</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;x: &#39;</span><span class="p">,</span><span class="n">xk</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;gfk: &#39;</span><span class="p">,</span><span class="n">gfk</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">fval</span><span class="p">):</span>
+        <span class="c1"># This can happen if the first call to f returned NaN;</span>
+        <span class="c1"># the loop is then never entered.</span>
+        <span class="n">warnflag</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">warnflag</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">_status_message</span><span class="p">[</span><span class="s1">&#39;pr_loss&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Current function value: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fval</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Iterations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Function evaluations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">func_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Gradient evaluations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">grad_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">elif</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="n">maxiter</span><span class="p">:</span>
+        <span class="n">warnflag</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">old_fval</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span><span class="n">print_out</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-BFGS_step_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">_status_message</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Current function value: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fval</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Iterations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Function evaluations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">func_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Gradient evaluations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">grad_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">_status_message</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Current function value: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fval</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Iterations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Function evaluations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">func_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         Gradient evaluations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">grad_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">OptimizeResult</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">fval</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">gfk</span><span class="p">,</span> <span class="n">hess_inv</span><span class="o">=</span><span class="n">Hk</span><span class="p">,</span> <span class="n">nfev</span><span class="o">=</span><span class="n">func_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">njev</span><span class="o">=</span><span class="n">grad_calls</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">status</span><span class="o">=</span><span class="n">warnflag</span><span class="p">,</span>
+                            <span class="n">success</span><span class="o">=</span><span class="p">(</span><span class="n">warnflag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">xk</span><span class="p">,</span>
+                            <span class="n">nit</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">retall</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;allvecs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">allvecs</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+
+<span class="k">def</span> <span class="nf">show_options</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Show documentation for additional options of optimization solvers.</span>
+
+<span class="sd">    These are method-specific options that can be supplied through the</span>
+<span class="sd">    ``options`` dict.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    solver : str</span>
+<span class="sd">        Type of optimization solver. One of &#39;minimize&#39;, &#39;minimize_scalar&#39;,</span>
+<span class="sd">        &#39;root&#39;, or &#39;linprog&#39;.</span>
+<span class="sd">    method : str, optional</span>
+<span class="sd">        If not given, shows all methods of the specified solver. Otherwise,</span>
+<span class="sd">        show only the options for the specified method. Valid values</span>
+<span class="sd">        corresponds to methods&#39; names of respective solver (e.g. &#39;BFGS&#39; for</span>
+<span class="sd">        &#39;minimize&#39;).</span>
+<span class="sd">    disp : bool, optional</span>
+<span class="sd">        Whether to print the result rather than returning it.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    text</span>
+<span class="sd">        Either None (for disp=False) or the text string (disp=True)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The solver-specific methods are:</span>
+
+<span class="sd">    `scipy.optimize.minimize`</span>
+
+<span class="sd">    - :ref:`BFGS        &lt;optimize.minimize-bfgs&gt;`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">textwrap</span>
+
+    <span class="n">doc_routines</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;minimize&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;bfgs&#39;</span><span class="p">,</span> <span class="s1">&#39;scipy.optimize.optimize._minimize_bfgs&#39;</span><span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">solver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\n\n\n</span><span class="s2">========</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;minimize</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;========</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">show_options</span><span class="p">(</span><span class="s1">&#39;minimize&#39;</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">===============</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;minimize_scalar</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;===============</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">solver</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc_routines</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown solver </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">solver</span><span class="p">,))</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">doc_routines</span><span class="p">[</span><span class="n">solver</span><span class="p">]:</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">])</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">show_options</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">methods</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">doc_routines</span><span class="p">[</span><span class="n">solver</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown method </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method</span><span class="p">,))</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">methods</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+
+            <span class="c1"># Import function object</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">mod_name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="nb">__import__</span><span class="p">(</span><span class="n">mod_name</span><span class="p">)</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">mod_name</span><span class="p">],</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># Get doc</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span>
+            <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">text</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">algor</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BFGS Quasi-Newton&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=================&quot;</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">fmin_bfgs</span><span class="p">(</span><span class="n">rosen</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">fprime</span><span class="o">=</span><span class="n">rosen_der</span><span class="p">,</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+    <span class="n">algor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;BFGS Quasi-Newton</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BFGS approximate gradient&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=========================&quot;</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">fmin_bfgs</span><span class="p">(</span><span class="n">rosen</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+    <span class="n">algor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;BFGS without gradient</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BFGS algopy gradient&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=========================&quot;</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">fmin_bfgs</span><span class="p">(</span><span class="n">rosen</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">fprime</span><span class="o">=</span><span class="n">algopy_wrapper</span><span class="p">(</span><span class="n">rosen</span><span class="p">),</span><span class="n">gtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+    <span class="n">algor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;BFGS without gradient</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, ttamayo.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../static/jquery.js"></script>
+      <script type="text/javascript" src="../../static/underscore.js"></script>
+      <script type="text/javascript" src="../../static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
