@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
 SPHINXPROJ    = DiffiQult
 SOURCEDIR     = .
-BUILDDIR      = /Documents/Algopy/DiffiQult/
+BUILDDIR      = ../../
 
 # Put it first so that "make" without argument is like "make help".
 help:
