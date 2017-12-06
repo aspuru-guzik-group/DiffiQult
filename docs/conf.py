@@ -122,6 +122,13 @@ html_theme_options = {
 }
 
 
+html_context = dict(
+    display_github=True,
+    conf_py_path='/docs/',
+    github_user="aspuru-guzik-group",
+    github_repo="DiffiQult",
+    github_version="master"
+)
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
