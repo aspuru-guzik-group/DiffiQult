@@ -3,12 +3,14 @@
 DiffiQult
 ===========
 
-*DiffiQult* is an open source autodifferentiable quantum chemistry package.
+*DiffiQult* is an open source autodifferentiable quantum chemistry package. 
 
-
-.. only:: html
 
    .. figure:: h2o_3g_MO_1.gif
+
+You can find the code here_.
+
+.. _here: https://github.com/aspuru-guzik-group/DiffiQult
 
 Method:
 
