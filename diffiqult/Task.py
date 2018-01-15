@@ -15,6 +15,38 @@ This module contain manages all tasks:
 -Gradients.
 '''
 
+def function_grads_algopy(function,argnum):
+    """This function returns a list with functions that extracts the gradient of the values
+    defined by args, args has the position of the inputs of energy
+    """
+    grad_fun =[]
+    def function_builder(narg):
+       def algo_jaco(args, **kwargs):
+           var = UTPM.init_jacobian(args[narg])
+           diff_args = list(args)              # We are making a copy of args
+           diff_args[narg] = var
+           diff_args[-1]= var
+           diff_args = tuple(diff_args)
+           return UTPM.extract_jacobian(rhfenergy(*(diff_args)))
+       return algo_jaco
+    for i in argnum:
+      grad_fun.append(function_builder(i))
+    return grad_fun
+
+
+def grad_evaluator_algopy(self,function,args,argnum, **kwargs):
+    """ This function returns the gradient of a function evaluated at args
+    with argumentx specify by argnum """
+    list_function = function_grads_algopy(function,args,argnum)
+    grad = []
+    for function in list_function:
+        grad.append(fuction(args,**kwargs))
+    return grad
+    
+      
+        
+    
+
 class Tasks(object):
      '''This class manage the implemented tasks over a system included
         in DiffiQult.
@@ -91,7 +123,19 @@ class Tasks(object):
          self.tape.write(' *************************************************\n\n')
 	 return
 
+     def _printenergy(self,max_scf,rguess):
+         self.tape.write(' SCF Initial parameters \n')
+         self.tape.write(' Maximum number of SCF: %d\n'%max_scf)
+         self.tape.write(' Default SCF tolerance: %f\n'%1e-8)
+         self.tape.write(' Initial density matrix: %s\n'%str(rguess))
+         self.sys.printcurrentgeombasis(self.tape)
+         return
+     
+     def _printgrad(self,max_scf,rguess):
+         self.tape.write(' \n Grad point ...\n')
+         self.tape.write(' ---Start--- \n')
 
+     
      def _energy_gradss(self,argnum,max_scf=301,max_d=300,printguess=None,name='Output.molden',output=False,order='first'):
        """This function returns the gradient of args"""
        ## For the moment it retuns a value at a time
@@ -103,25 +147,14 @@ class Tasks(object):
                max_scf,max_d,log,eigen,None,None,
                name,output,self.sys.alpha] # Last term is only used for Algopy
        if self.verbose:
-             self.tape.write(' \n Grad point ...\n')
-             self.tape.write(' ---Start--- \n')
-             self.tape.write(' Initial parameters \n')
-             self.tape.write(' Maximum number of SCF: %d\n'%max_scf)
-             self.tape.write(' Default SCF tolerance: %f\n'%1e-8)
-             self.tape.write(' Initial density matrix: %s\n'%str(rguess))
-             self.sys.printcurrentgeombasis(self.tape)
-       grad_fun =[]
-       for i in argnum:
-           var = UTPM.init_jacobian(args[i])
-           diff_args = list(args)              # We are making a copy of args
-           diff_args[i] = var
-           diff_args[-1]= var
-           t0 = time.clock()
-           grad = UTPM.extract_jacobian(rhfenergy(*(diff_args)))
-           timer = time.clock() - t0
-           self.sys.grad = grad
-           self.tape.write(' ---End--- \n')
-           self.tape.write(' Time %3.7f :\n'%timer)
+          self._printgrad(max_scf,rguess)
+
+       t0 = time.clock()
+       grad = grad_fun(ene_function,args,argnum)
+       timer = time.clock() - t0
+       self.sys.grad = grad
+       self.tape.write(' ---End--- \n')
+       /self.tape.write(' Time %3.7f :\n'%timer)
        return grad
   
      def _singlepoint(self,max_scf=300,max_d=300,printcoef=False,name='Output.molden',output=False):
@@ -201,24 +234,6 @@ class Tasks(object):
                          argnum=argnums,
                          method='BFGS',jac=grad_fun,gtol=tol,name=name,options={'disp': True},**kwargs)
           return terms 
-
-     def _algo_gradfun(self,function,args,argnum):
-         """This function returns a list with functions that extracts the gradient of the values
-         defined by args, args has the position of the inputs of energy
-         """
-         grad_fun =[]
-         def function_builder(narg):
-            def algo_jaco(*args, **kwargs):
-                var = UTPM.init_jacobian(args[narg])
-                diff_args = list(args)              # We are making a copy of args
-                diff_args[narg] = var
-                diff_args[-1]= var
-                diff_args = tuple(diff_args)
-                return UTPM.extract_jacobian(rhfenergy(*(diff_args)))
-            return algo_jaco
-         for i in argnum:
-           grad_fun.append(function_builder(i))
-	 return grad_fun
 
 
      def _algo_hessfun(self,function,args,argnum):
@@ -304,7 +319,7 @@ class Tasks(object):
                self.sys.list_contr,self.sys.ne,
                max_scf,max_scf,log,True,pguess,rguess,
                name,record,self.sys.alpha] # Last term is only used for Algopy
-          grad_fun = self._algo_gradfun(ene_function,args,argnum)  ## This defines de gradient function of autograd
+          grad_fun = function_grads_algopy(ene_function,argnum)  ## This defines de gradient function of autograd
           opt = self.select_method.get(method,lambda: self._BFGS)  ## This selects the opt method
           t0 = time.clock()
           res = opt(ene_function,grad_fun,args,argnum,log,name,**otherargs)
@@ -392,6 +407,8 @@ class Tasks(object):
               'Energy' is a single point calculation.
 
               'Opt' an optimization of a given parameter.
+        
+              'Grad' the energy gradient with respect to a parameter
 
         Options:
               Check documentation for each task

@@ -216,3 +216,4 @@ class System_mol():
            line +=' '+str(self.l[i][0]) +' '+str(self.l[i][1]) +' '+str(self.l[i][2]) +'\n'
            tape.write(line)
        tape.write('\n')
+
