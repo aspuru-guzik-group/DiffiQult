@@ -176,7 +176,7 @@ class Tasks(object):
          self.tape.write(' ---End--- \n')
          for i,argn in enumerate(argnum):
               self.tape.write('  %s:\n'%args_dict[i])
-              self.tape.write('  '+grad[i])
+              self.tape.write('  '+str(grad[i]))
          self.tape.write(' Time %3.7f :\n'%timer)
 
      def _print_head_energy(self,max_scf,rguess):
