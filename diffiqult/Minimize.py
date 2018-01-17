@@ -4,13 +4,14 @@ Functions
 ---------
 """
 import Optimize
-from Optimize import _minimize_bfgs
+from Optimize import minimize_bfgs
+
 ## TODO add tool value
 def minimize(fun, x0, args=(),  method='BFGS', jac=None,tol=None,gtol=None,
              callback=None, argnum=None,name=None,**options):
 
     if method == 'BFGS':
-        return _minimize_bfgs(fun, x0, args, argnum, jac, callback, name, gtol,**options)
+        return minimize_bfgs(fun, x0, args, argnum, jac, callback, name, gtol,**options)
     else:
         raise ValueError('Unknown solver %s' % method)
 

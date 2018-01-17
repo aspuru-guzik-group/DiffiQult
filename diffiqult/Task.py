@@ -4,6 +4,7 @@ from Dipole import dipolemoment
 from Minimize import minimize
 from Molecule import Getbasis,Getgeom,System_mol
 
+import sys
 import numpy as np
 import time
 import algopy
@@ -15,6 +16,60 @@ This module contain manages all tasks:
 -Gradients.
 '''
 
+args_dict = {0: 'Exponents',
+             1: 'Contraction coefficients',
+             2: 'Gaussian centers',
+             4: 'Geometry centers'}
+
+
+def function_grads_algopy(function,argnum):
+    """This function returns a list with functions that extracts the gradient of the values
+    defined by args, args has the position of the inputs of function
+    """
+    grad_fun =[]
+    def function_builder(narg):
+       def algo_jaco(*args, **kwargs):
+           var = UTPM.init_jacobian(args[narg])
+           diff_args = list(args)              # We are making a copy of args
+           diff_args[narg] = var
+           diff_args[-1]= var
+           diff_args = tuple(diff_args)
+           return UTPM.extract_jacobian(rhfenergy(*(diff_args)))
+       return algo_jaco
+    for i in argnum:
+      grad_fun.append(function_builder(i))
+    return grad_fun
+
+
+def grad_evaluator_algopy(function,args,argnum, **kwargs):
+    """ This function returns the gradient of a function evaluated at args
+    with argumentx specify by argnum """
+    list_function = function_grads_algopy(function,argnum)
+    grad = []
+    for function in list_function:
+        grad.append(function(*args,**kwargs))
+    return grad
+
+
+
+def function_hessian_algopy(function,argnum):
+    """This function returns a list with functions that extracts the hessian of the values
+    defined by args, args has the position of the inputs of energy """
+    grad_fun =[]
+    def function_builder(narg):
+       def algo_jaco(args, **kwargs):
+           var = UTPM.init_hessian(args[narg])
+           diff_args = list(args)              # We are making a copy of args
+           diff_args[narg] = var
+           diff_args[-1]= var
+           diff_args = tuple(diff_args)
+           return UTPM.extract_hessian(rhfenergy(*(diff_args)))
+       return algo_jaco
+    for i in argnum:
+      grad_fun.append(function_builder(i))
+    return grad_fun
+
+    
 class Tasks(object):
      '''This class manage the implemented tasks over a system included
         in DiffiQult.
@@ -35,6 +90,8 @@ class Tasks(object):
                True the SCF and/or the optimization converged.
 
      '''
+
+
      def __init__(self,mol,name,verbose=False):
           '''
           Initialize task object that contains the inital parameters.
@@ -66,7 +123,7 @@ class Tasks(object):
           self._select_task ={
               "Energy": self.energy,
               "Opt": self.optimization,
-              "Grad": self._energy_gradss,
+              "Grad": self.gradient,
           }
           self.select_method ={
               'BFGS': self._BFGS,
@@ -74,56 +131,114 @@ class Tasks(object):
           self.ntask = 0
           return
 
+     def _energy_args(self,max_scf=100,max_d=10,log=True,printguess=None,readguess=None,name='Output.molden',write=False,eigen=True):
+          if log:
+             alpha = np.log(self.sys.alpha)
+          else:
+             alpha = self.sys.alpha
+          args=[alpha,self.sys.coef,self.sys.xyz,self.sys.l,self.sys.charges,self.sys.atom,self.sys.natoms,self.sys.nbasis,
+               self.sys.list_contr,self.sys.ne,
+               max_scf,max_d,log,eigen,
+               printguess,readguess,
+               name,write,np.float(1.0)] # Last term is only used for Algopy
+          return args
+
      def _printheader(self):
 	 """This function prints the header of the outputfile"""
          self.tape.write(' *************************************************\n')
-         self.tape.write(' DiffiQult Ago 2017\n')
+         self.tape.write(' DiffiQult \n')
          self.tape.write(' Author: Teresa Tamayo Mendoza \n')
          self.tape.write(' *************************************************\n\n')
          localtime = time.asctime( time.localtime(time.time()) )
 	 self.tape.write(" Starting at %s\n"%localtime)
         
 
-    
      def _printtail(self):
          localtime = time.asctime( time.localtime(time.time()) )
 	 self.tape.write(" Finishing at %s \n"%localtime)
          self.tape.write(' *************************************************\n\n')
 	 return
 
+     def _printenergy(self,max_scf,rguess,tol=1e-8):
+         self.tape.write(' SCF Initial parameters \n')
+         self.tape.write(' Maximum number of SCF: %d\n'%max_scf)
+         self.tape.write(' Default SCF tolerance: %f\n'%tol)
+         self.tape.write(' Initial density matrix: %s\n'%str(rguess))
+         self.sys.printcurrentgeombasis(self.tape)
+         return
+     
+     def _print_head_grad(self,max_scf,rguess):
+         self.tape.write(' \n Grad single point ...\n')
+         self.tape.write(' ---Start--- \n')
+         self._printenergy(max_scf,rguess)
 
-     def _energy_gradss(self,argnum,max_scf=301,max_d=300,printguess=None,name='Output.molden',output=False,order='first'):
+     def _print_tail_grad(self,timer,grad,argnum):
+         self.tape.write(' ---End--- \n')
+         for i,argn in enumerate(argnum):
+              self.tape.write('  %s:\n'%args_dict[i])
+              self.tape.write('  '+str(grad[i]))
+         self.tape.write(' Time %3.7f :\n'%timer)
+
+     def _print_head_energy(self,max_scf,rguess):
+         self.tape.write(' \n Single point ...\n')
+         self.tape.write(' ---Start--- \n')
+         self._printenergy(max_scf,rguess)
+
+     def _print_tail_energy(self,timer,ene,pguess,output=False,name='Output.molden'):
+          self.tape.write(' ---End--- \n')
+          self.tape.write(' Time %3.7f :\n'%timer)
+          if (ene == 99999):
+             self.tape.write(' SCF did not converged :( !!\n')
+          else:
+             self.tape.write(' SCF converged!!\n')
+             self.tape.write(' Energy: %3.7f \n'%ene)
+             if pguess != None:
+                self.tape.write(' Coefficients in file: %s\n'%pguess)
+          if output:
+             self.tape.write(' Result in file: %s\n'%name)
+
+     def _print_tail_optimization(self,res,timer):
+          self.tape.write(' ---End--- \n')
+          self.tape.write(' Time %3.7f :\n'%timer)
+          self.tape.write(' Message: %s\n'%res.message)
+          self.tape.write(' Current energy: %f\n'%res.fun)
+          self.tape.write(' Current gradient % f \n'%np.linalg.norm(res.jac,ord=np.inf))
+          self.tape.write(' Number of iterations %d \n'%res.nit)
+          self.sys.printcurrentgeombasis(self.tape)
+
+     def _optprintparam(self,max_scf,rguess,maxiter=30,**kwarg):
+          self.tape.write(' Initial parameters \n')
+          self.tape.write(' Maximum number of optimization steps: %d\n'%maxiter)
+          self.tape.write(' Tolerance in jac infinity norm (Hardcoded): %f \n'%1e-1)
+          self.tape.write(' Tolerance in energy (Hardcoded): %f \n'%1e-5)
+          self._printenergy(max_scf,rguess,tol=1e-8)
+
+     def _print_head_optimization(self,name,max_scf,rguess,**kwarg):
+          self.tape.write(' \n Optimization ...\n')
+          self.tape.write(' Outputfiles prefix: %s'%name)
+          self.tape.write(' ---Start--- \n')
+          self._optprintparam(max_scf,rguess,**kwarg)
+
+
+     def _energy_gradss(self,argnum,max_scf=100,max_d=300,readguess=None,name='Output.molden',output=False,order='first'):
        """This function returns the gradient of args"""
        ## For the moment it retuns a value at a time
        ## This is used only by testing functions.
-       eigen = True
-       rguess = False
-       args=[np.log(self.sys.alpha),self.sys.coef,self.sys.xyz,self.sys.l,self.sys.charges,self.sys.atom,self.sys.natoms,self.sys.nbasis,
-               self.sys.list_contr,self.sys.ne,
-               max_scf,max_d,log,eigen,None,None,
-               name,output,self.sys.alpha] # Last term is only used for Algopy
+       args = self._energy_args(max_scf=max_scf,max_d=max_d,log=True,printguess=None,readguess=readguess,name=name,write=output)
+
        if self.verbose:
-             self.tape.write(' \n Grad point ...\n')
-             self.tape.write(' ---Start--- \n')
-             self.tape.write(' Initial parameters \n')
-             self.tape.write(' Maximum number of SCF: %d\n'%max_scf)
-             self.tape.write(' Default SCF tolerance: %f\n'%1e-8)
-             self.tape.write(' Initial density matrix: %s\n'%str(rguess))
-             self.sys.printcurrentgeombasis(self.tape)
-       grad_fun =[]
-       for i in argnum:
-           var = UTPM.init_jacobian(args[i])
-           diff_args = list(args)              # We are making a copy of args
-           diff_args[i] = var
-           diff_args[-1]= var
-           t0 = time.clock()
-           grad = UTPM.extract_jacobian(rhfenergy(*(diff_args)))
-           timer = time.clock() - t0
-           self.sys.grad = grad
-           self.tape.write(' ---End--- \n')
-           self.tape.write(' Time %3.7f :\n'%timer)
+          t0 = time.clock()
+          self._print_head_grad(max_scf,readguess)
+
+       ene_function = rhfenergy
+       grad = grad_evaluator_algopy(ene_function,args,argnum)
+       self.sys.grad = grad
+
+       if self.verbose:
+          timer = time.clock() - t0
+          self._print_tail_grad(timer,grad,argnum)
        return grad
-  
+
      def _singlepoint(self,max_scf=300,max_d=300,printcoef=False,name='Output.molden',output=False):
           """
           This function calculates a single point energy
@@ -132,7 +247,6 @@ class Tasks(object):
           """
           log = True # We are not using logarithms of alphas
           eigen = True # We are using diagonalizations
-          readguess = False #By now, we are stating the densisty matrix from scratch
 
        	  rguess = None
           if printcoef:
@@ -140,48 +254,27 @@ class Tasks(object):
           else:
              pguess = None
 
-       	  args=[np.log(self.sys.alpha),self.sys.coef,self.sys.xyz,self.sys.l,self.sys.charges,self.sys.atom,self.sys.natoms,self.sys.nbasis,
-               self.sys.list_contr,self.sys.ne,
-               max_scf,max_d,log,eigen,pguess,rguess,
-               name,output,self.sys.alpha] # Last term is only used for Algopy
 
 	  if self.verbose:
-             self.tape.write(' \n Single point ...\n')
-             self.tape.write(' ---Start--- \n')
-             self.tape.write(' Initial parameters \n')
-             self.tape.write(' Maximum number of SCF: %d\n'%max_scf)
-             self.tape.write(' Default SCF tolerance: %f\n'%1e-8)
-             self.tape.write(' Initial density matrix: %s\n'%str(rguess))
-             self.sys.printcurrentgeombasis(self.tape)
+             self._print_head_energy(max_scf,rguess)
+             t0 = time.clock()
+
+          args = self._energy_args(max_scf=max_scf,max_d=max_d,log=True,printguess=pguess,readguess=rguess,name=name,write=output)
 
           # Function         
-          t0 = time.clock()
           ene = rhfenergy(*(args))
-          timer = time.clock() - t0
+          if (ene == 99999):
+             self.status = False
+             print(' SCF did not converged :( !! %s\n')
+          else:
+             print(' SCF converged!!')
+             print(' Energy: %3.7f'%ene)
+             print(' Result in file: %s\n'%name)
 
           self.energy = ene
           if self.verbose:
-             self.tape.write(' ---End--- \n')
-             self.tape.write(' Time %3.7f :\n'%timer)
-
-          if (ene == 99999):
-             if self.verbose:
-                 self.tape.write(' SCF did not converged :( !!\n')
-             print(' SCF did not converged :( !! %s\n')
-             self.status = False
-          else:
-             if self.verbose:
-                self.tape.write(' SCF converged!!\n')
-                self.tape.write(' Energy: %3.7f \n'%ene)
-                if pguess != None:
-                   self.tape.write(' Coefficients in file: %s\n'%pguess)
-             print(' SCF converged!!')
-             print(' Energy: %3.7f'%ene)
-          if output:
-             if self.verbose:
-                self.tape.write(' Result in file: %s\n'%name)
-             else:
-                print(' Result in file: %s\n'%name)
+             timer = time.clock() - t0
+             self._print_tail_energy(timer,ene,pguess,output=output,name=name)
           return ene 
 
 
@@ -202,43 +295,6 @@ class Tasks(object):
                          method='BFGS',jac=grad_fun,gtol=tol,name=name,options={'disp': True},**kwargs)
           return terms 
 
-     def _algo_gradfun(self,function,args,argnum):
-         """This function returns a list with functions that extracts the gradient of the values
-         defined by args, args has the position of the inputs of energy
-         """
-         grad_fun =[]
-         def function_builder(narg):
-            def algo_jaco(*args, **kwargs):
-                var = UTPM.init_jacobian(args[narg])
-                diff_args = list(args)              # We are making a copy of args
-                diff_args[narg] = var
-                diff_args[-1]= var
-                diff_args = tuple(diff_args)
-                return UTPM.extract_jacobian(rhfenergy(*(diff_args)))
-            return algo_jaco
-         for i in argnum:
-           grad_fun.append(function_builder(i))
-	 return grad_fun
-
-
-     def _algo_hessfun(self,function,args,argnum):
-         '''This function returns a list with functions that extracts the hessian of the values
-         defined by args, args has the position of the inputs of energy '''
-         grad_fun =[]
-         def function_builder(narg):
-            def algo_jaco(*args, **kwargs):
-                var = UTPM.init_hessian(args[narg])
-                diff_args = list(args)              # We are making a copy of args
-                diff_args[narg] = var
-                diff_args[-1]= var
-                diff_args = tuple(diff_args)
-                return UTPM.extract_hessian(rhfenergy(*(diff_args)))
-            return algo_jaco
-         for i in argnum:
-           grad_fun.append(function_builder(i))
-	 return grad_fun
-
-
      def _optupdateparam(self,argnum,x):
           ### HARD CODED (ONLY WORKS WITH ALPHA AND XYZ)
           cont = 0
@@ -253,64 +309,46 @@ class Tasks(object):
                  self.sys.coef = x[cont:cont+len(self.sys.alpha)] 
                  cont += self.sys.alpha
              else:
-                 raise NotImplementedError("Optimization is just recticted to contraction coefficients, exponents and Gaussian centers ")
+                 raise NotImplementedError("Optimization is just restricted to contraction coefficients, exponents and Gaussian centers ")
           return
           
-     def _optprintres(self,res,timer):
-          self.tape.write(' ---End--- \n')
-          self.tape.write(' Time %3.7f :\n'%timer)
-          self.tape.write(' Message: %s\n'%res.message)
-          self.tape.write(' Current energy: %f\n'%res.fun)
-          self.tape.write(' Current gradient % f \n'%np.linalg.norm(res.jac,ord=np.inf))
-          self.tape.write(' Number of iterations %d \n'%res.nit)
-          self.sys.printcurrentgeombasis(self.tape)
-
-     def _optprintparam(self,max_scf,rguess):
-          self.tape.write(' Initial parameters \n')
-          self.tape.write(' Maximum number of SCF: %d\n'%max_scf)
-          self.tape.write(' Default SCF tolerance: %f\n'%1e-8)
-          self.tape.write(' Initial density matrix: %s\n'%str(rguess))
-          self.tape.write(' Maximum number of optimization steps: (FIX ME)%d\n'%30)
-          self.tape.write(' Tolerance in jac infinity norm (Hardcoded): %f \n'%1e-1)
-          self.tape.write(' Tolerance in energy (Hardcoded): %f \n'%1e-5)
-          self.sys.printcurrentgeombasis(self.tape)
-
      def _optimization(self,max_scf=100,log=True,scf=True,readguess=None,argnum=[0],taskname='Output', method='BFGS',penalize=None,**otherargs):
+          print readguess
+          print max_scf
+	  if self.verbose:
+             t0 = time.clock()
+             self._print_head_optimization(taskname,max_scf,readguess,**otherargs)
+
           name=taskname
-          record = False
-          maxsteps = 100
-          rhf_old = 1000
-          grad_fun = []
-          lbda = 1.0
           rguess = None
+       
+          ### If initial guess
           if readguess:
              pguess = name +'.npy'
              out = False
-             ene = self._singlepoint(maxsteps,maxsteps,pguess,name,False)
+             ene = self._singlepoint(max_scf,max_d,printcoef=pguess,name=name,output=False)
 	     if ene == 99999:
                 raise NameError('SCF did not converved')
              rguess= pguess
 
-	  if self.verbose:
-             self.tape.write(' \n Optimization ...\n')
-             self.tape.write(' ---Start--- \n')
-             self._optprintparam(max_scf,rguess)
-
-          ene_function = rhfenergy
           pguess = None
-
           record = False
-       	  args=[np.log(self.sys.alpha),self.sys.coef,self.sys.xyz,self.sys.l,self.sys.charges,self.sys.atom,self.sys.natoms,self.sys.nbasis,
-               self.sys.list_contr,self.sys.ne,
-               max_scf,max_scf,log,True,pguess,rguess,
-               name,record,self.sys.alpha] # Last term is only used for Algopy
-          grad_fun = self._algo_gradfun(ene_function,args,argnum)  ## This defines de gradient function of autograd
+
+          args = self._energy_args(max_scf=max_scf,max_d=max_scf,log=log,
+                                   printguess=pguess,readguess=rguess,
+                                   name=name,write=record)
+          ene_function = rhfenergy
+          grad_fun = function_grads_algopy(ene_function,argnum)  ## This defines de gradient function of autograd
           opt = self.select_method.get(method,lambda: self._BFGS)  ## This selects the opt method
-          t0 = time.clock()
+
           res = opt(ene_function,grad_fun,args,argnum,log,name,**otherargs)
-          timer = time.clock()-t0
-          self._optupdateparam(argnum,res.x)
+
+	  if self.verbose:
+             timer = time.clock()-t0
+             self._print_tail_optimization(res,timer)
+
           self.status = bool(res.status == 0 or res.status==1)
+          self._optupdateparam(argnum,res.x)
           return res,timer
 
      def dipole(self,coef_file=None,max_scf=100,name='Output',**kwargs):
@@ -350,13 +388,29 @@ class Tasks(object):
                  
         '''
         name = self.name+'-task-'+str(self.ntask)
-        if self.verbose:
-           self.tape.write(' Outputfiles prefix: %s'%name)
         res,timer = self._optimization(max_scf,log,scf,readguess,argnum,taskname=name,**kwargs)
-        if self.verbose:
-               self._optprintres(res,timer)
         return
 
+     def gradient(self,argnum=0,max_scf=30,max_d=300,printguess=None,output=False,**kwargs):
+        '''
+        This function handdles the single point calculations
+
+        Options:
+
+        max_scf : integer
+
+                 Maximum number of scf steps, default 30.
+        printguess : str 
+
+                 File path if it is requiered to prepare an inital guess for the molecular orbital coefficients.
+
+        output : bool
+
+                 True if it will print a molden file in case of success.
+        '''
+        name = self.name+'-'+str(self.ntask)
+        self._energy_gradss(argnum,max_scf,max_d,printguess,name,output)
+        return self._energy_gradss(argnum,max_scf,max_d,printguess,name,output)
 
      def energy(self,max_scf=30,max_d=300,printguess=None,output=False,**kwargs):
         '''
@@ -375,8 +429,6 @@ class Tasks(object):
                  True if it will print a molden file in case of success.
         '''
         name = self.name+'-'+str(self.ntask)
-        if self.verbose:
-           self.tape.write(' Output molden file: %s'%name)
         self._singlepoint(max_scf,max_d,printguess,name,output)
         return
 
@@ -392,6 +444,8 @@ class Tasks(object):
               'Energy' is a single point calculation.
 
               'Opt' an optimization of a given parameter.
+        
+              'Grad' the energy gradient with respect to a parameter
 
         Options:
               Check documentation for each task
@@ -433,7 +487,7 @@ def main():
                          mol_name='agua')                    ## Units -> Bohr
  
      manager = Tasks(system,
-                     name='../testfiles/h2_sto_3g',      ## Prefix for all optput files
+                     name='../tests/testfiles/h2_sto_3g',      ## Prefix for all optput files
                      verbose=True)          ## If there is going to be an output
 
     
@@ -447,15 +501,24 @@ def main():
                      max_scf=50,
                      printcoef=False,
                      argnum=[2],
-                     output=True)
+                     output=True,
+                     maxiter=2)
 
      manager.runtask('Opt',
                      max_scf=50,
                      printcoef=False,
                      argnum=[0],
-                     output=True)
+                     output=True,
+                     maxiter=2)
 
      manager.runtask('Opt',
+                     max_scf=50,
+                     printcoef=False,
+                     argnum=[0],
+                     output=True,
+                     maxiter=2)
+
+     manager.runtask('Grad',
                      max_scf=50,
                      printcoef=False,
                      argnum=[0],

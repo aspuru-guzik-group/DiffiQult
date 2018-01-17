@@ -1,5 +1,5 @@
 import numpy as np
-from Data import select_atom
+from Param import select_atom
 
 
 class Getbasis():
@@ -90,8 +90,8 @@ class Getgeom():
 
     '''
     def __init__(self,molecule):
-      '''
-      Parameters:
+       '''
+       Parameters:
          molecule : list
                  It contains spects of geometry
                  [( atomic_number_atom_1,(x,y,z), 
@@ -216,3 +216,4 @@ class System_mol():
            line +=' '+str(self.l[i][0]) +' '+str(self.l[i][1]) +' '+str(self.l[i][2]) +'\n'
            tape.write(line)
        tape.write('\n')
+
