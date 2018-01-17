@@ -487,7 +487,7 @@ def main():
                          mol_name='agua')                    ## Units -> Bohr
  
      manager = Tasks(system,
-                     name='../testfiles/h2_sto_3g',      ## Prefix for all optput files
+                     name='../tests/testfiles/h2_sto_3g',      ## Prefix for all optput files
                      verbose=True)          ## If there is going to be an output
 
     

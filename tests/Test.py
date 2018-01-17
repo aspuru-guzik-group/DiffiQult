@@ -1,4 +1,4 @@
-import unittest
+import unittes
 from diffiqult import Task 
 from diffiqult.Molecule import System_mol, Getbasis,Getgeom
 from diffiqult.Integrals import overlapmatrix, normalization, nuclearmatrix, kineticmatrix, erivector
@@ -408,12 +408,6 @@ class Test_Molecules(unittest.TestCase):
                                             alpha_epsilon,self.coef[k],self.xyz[k],self.l[k],self.alpha[m],self.coef[m],self.xyz[m],self.l[m])
                       dEriij_da += (Eriij_epsilon- Eris[eri_index(i,j,k,m,self.nbasis)])/epsilon
                    self.assertAlmostEqual(dEriij_da,grad_algo[eri_index(i,j,k,m,nbasis),i], msg="Error: Test Eris grad"+Mol.mol_name,places=6)
-                   #diff = dEriij_da - grad_algo[eri_index(i,j,k,m,nbasis),i]
-                   #if abs(diff) > tool:
-                   #    print dEriij_da, grad_algo[eri_index(i,j,k,m,nbasis),i]
-                   #    print i,j,k,m
-                   #    print "Error: Test Eri Grad"
-                   #    exit()
        pass
 
     def energy(self):
