@@ -17,6 +17,34 @@ Features:
 * Energy gradients with respect to any parameter of the one-particle basis functions.
 * Energy optimization with respect of any parameter of the Gaussian basis functions.
 
+For more information see:
+https://doi.org/10.1021/acscentsci.7b00586
+
+===============
+How to Cite
+===============
+Please cite DiffiQult as follows:  
+
+        Tamayo-Mendoza, T., Kreisbeck, C., Lindh, R., & Aspuru-Guzik, A. (2018).
+        Automatic differentiation in quantum chemistry with applications to fully variational Hartree–Fock.
+        ACS central science, 4(5), 559-566.
+
+
+Bibtex:
+
+        @article{tamayo2018automatic,
+        title={Automatic differentiation in quantum chemistry with applications to fully variational Hartree--Fock},
+        author={Tamayo-Mendoza, Teresa and Kreisbeck, Christoph and Lindh, Roland and Aspuru-Guzik, Al{\'a}n},
+        journal={ACS central science},
+        volume={4},
+        number={5},
+        pages={559--566},
+        year={2018},
+        publisher={ACS Publications}}
+
+
+
+
 ===============
 Getting started with DiffiQult
 ===============
